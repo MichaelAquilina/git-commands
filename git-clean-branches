@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+delete_type="-d"
+if [ "$1" = "-D" ];
+then
+    delete_type="-D"
+fi
+
+git branch --merged master | grep -v master | while read -r branch;
+do
+    # First two characters in branch will be either "  " or "* "
+    git branch "$delete_type" "${branch:2}"
+done
