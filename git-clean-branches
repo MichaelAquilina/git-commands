@@ -7,5 +7,5 @@ fi
 
 git branch --merged master | grep -v master | while read -r branch;
 do
-    git branch "$delete_type" "${branch}"
+    git branch "$delete_type" "${branch/* /}"
 done
