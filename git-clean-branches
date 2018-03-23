@@ -5,7 +5,9 @@ then
     delete_type="-D"
 fi
 
-git branch --merged master | grep -v master | while read -r branch;
+current="$(git rev-parse --abbrev-ref HEAD)"
+
+git branch --merged "$current"| grep -v "$current" | while read -r branch;
 do
     git branch "$delete_type" "${branch}"
 done
