@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MichaelAquilina/git-clean-branches.svg?branch=master)](https://travis-ci.org/MichaelAquilina/git-clean-branches)
+
 Helper command for git.
 
 Cleans (delete) any branches that have been been merged into master. This should make
