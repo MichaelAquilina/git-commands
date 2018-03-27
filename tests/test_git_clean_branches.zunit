@@ -1,0 +1,110 @@
+#!/usr/bin/env zunit
+
+@setup {
+  gcb="$PWD/git-clean-branches"
+  target="$(mktemp -d)"
+  cd "$target"
+
+  git init
+
+
+  # Use a test configuration for committing
+  git config --local commit.gpgsign false
+  git config --local user.email "test@test.com"
+  git config --local user.name "Test User"
+}
+
+
+@teardown {
+  cd -
+  rm -rf "$target"
+  rm -rf "$target_bin"
+  PATH="$INITIAL_PATH"
+}
+
+
+@test 'we are working in a git directory' {
+  run git status
+
+  assert $state equals 0
+  assert "$lines[1]" same_as "On branch master"
+}
+
+
+@test 'nothing removed on empty git dir' {
+  run "$gcb"
+
+  assert $state equals 0
+  assert "$output" is_empty
+}
+
+
+@test 'nothing deleted if no old branches exist' {
+  touch "hello.txt"
+  git add hello.txt
+  git commit -m "test commit"
+
+  run "$gcb"
+
+  assert $state equals 0
+  assert "$output" is_empty
+}
+
+
+@test 'cleans out branches with no commits' {
+  touch "hello.txt"
+  git add hello.txt
+  git commit -m "test commit"
+  git branch empty_branch
+  commit_id="$(git rev-parse --short empty_branch)"
+
+  run "$gcb"
+
+  assert $state equals 0
+  assert "$output" same_as "Deleted branch empty_branch (was $commit_id)."
+}
+
+
+@test 'does not clean out non-empty unmerged branches' {
+  touch "hello.txt"
+  git add hello.txt
+  git commit -m "test commit"
+
+  git checkout -b non_empty_branch
+  echo hello > "hello.txt"
+  git commit -am "updated commit"
+
+  git checkout master
+
+  run "$gcb"
+
+  assert $state equals 0
+  assert "$output" is_empty
+}
+
+
+@test 'does clean out non-empty merged branches' {
+  touch "hello.txt"
+  git add hello.txt
+  git commit -m "test commit"
+
+  # Start off a new branch
+  git checkout -b merged_branch
+  echo hello > "hello.txt"
+  git commit -am "updated commit"
+  commit_id="$(git rev-parse --short merged_branch)"
+
+  git checkout master
+
+  # make sure its not simplified into a rebase
+  echo "hello" > hello2.txt
+  git add .
+  git commit -m "master commit"
+
+  git merge merged_branch
+
+  run "$gcb"
+
+  assert $state equals 0
+  assert "$output" same_as "Deleted branch merged_branch (was $commit_id)."
+}

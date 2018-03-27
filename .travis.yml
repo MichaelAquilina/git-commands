@@ -1,0 +1,33 @@
+dist: trusty
+sudo: required
+
+language: generic
+
+env:
+ - ZSH_VERSION=5.3.1 URL="https://downloads.sourceforge.net/project/zsh/zsh/5.3.1/zsh-5.3.1.tar.xz"
+
+addons:
+  apt:
+    packages:
+    - build-essential
+
+before_install:
+    - export LOCAL="$(mktemp --directory --tmpdir=${TMPDIR:/tmp} local.bin.XXXXXX)"
+    - wget "$URL"
+    - tar -xf zsh-$ZSH_VERSION.tar.*
+    - cd zsh-$ZSH_VERSION
+    - ./configure --prefix="$LOCAL"
+    - make
+    - make install
+    - cd -
+    - export PATH="$LOCAL/bin:$PATH"
+
+before_script:
+    - mkdir -p ~/bin
+    # Required dependency for zunit
+    - curl -L "https://raw.githubusercontent.com/molovo/revolver/master/revolver" > ~/bin/revolver
+    - curl -L "https://github.com/molovo/zunit/releases/download/v0.8.2/zunit" > ~/bin/zunit
+    - chmod u+x ~/bin/{zunit,revolver}
+
+script:
+    - zunit
