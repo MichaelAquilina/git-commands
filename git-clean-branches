@@ -1,13 +1,10 @@
 #!/usr/bin/env sh
 delete_type="-d"
-if [ "$1" = "-D" ];
-then
-    delete_type="-D"
-fi
 
-current="$(git rev-parse --abbrev-ref HEAD)"
+[ "$1" = "-D" ] && delete_type="-D"
+[ -z "$(git branch)" ] && exit
 
-git branch --merged "$current"| grep -v "$current" | while read -r branch;
+git branch --merged "master"| grep -v "master" | while read -r branch;
 do
     git branch "$delete_type" "${branch}"
 done
