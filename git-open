@@ -1,0 +1,37 @@
+#!/bin/bash
+
+DEFAULT_REMOTE="origin"
+
+if [[ -n "$1" ]]; then
+    REMOTE="$1"
+else
+    REMOTE="$DEFAULT_REMOTE"
+fi
+
+url="$(git remote get-url "$REMOTE")"
+if [[ "$?" != 0 ]]; then
+    printf "available remotes:\n%s\n" "$(git remote)"
+    exit 1
+fi
+
+if [[ "$url" = "git@"* ]]; then
+    url="${url#git@}"
+
+    delimiter="$(expr index "$url" :)"
+
+    domain="${url:0:$delimiter-1}"
+    path="${url:$delimiter}"
+    path="${path%.git}"
+
+    target_url="https://$domain/$path"
+
+elif [[ "$url" = "http"* ]]; then
+    target_url="$url"
+fi
+
+if [[ -n "$target_url" ]]; then
+    xdg-open "$target_url" 2>/dev/null
+else
+    printf "Could not determine target url to open for '%s'\n" "$url"
+    exit 3
+fi
