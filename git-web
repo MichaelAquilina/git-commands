@@ -41,6 +41,6 @@ if [[ -n "$target_url" ]]; then
         exit 2
     fi
 else
-    printf "Could not determine target url to open for '%s'\n" "$url"
+    printf "Could not determine target url to open for '%s' (%s)\n" "$REMOTE" "$url"
     exit 3
 fi
