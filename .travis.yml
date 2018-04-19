@@ -3,9 +3,6 @@ sudo: required
 
 language: generic
 
-env:
- - ZSH_VERSION=5.3.1 URL="https://downloads.sourceforge.net/project/zsh/zsh/5.3.1/zsh-5.3.1.tar.xz"
-
 addons:
   apt:
     packages:
@@ -13,23 +10,13 @@ addons:
     - shellcheck
 
 before_install:
-    - export LOCAL="$(mktemp --directory --tmpdir=${TMPDIR:/tmp} local.bin.XXXXXX)"
-    - wget "$URL"
-    - tar -xf zsh-$ZSH_VERSION.tar.*
-    - cd zsh-$ZSH_VERSION
-    - ./configure --prefix="$LOCAL"
-    - make
-    - make install
-    - cd -
-    - export PATH="$LOCAL/bin:$PATH"
+    - VERSION="0.4.0"
+    - wget "https://github.com/sstephenson/bats/archive/v$VERSION.tar.gz"
+    - tar -xf "v$VERSION.tar.gz"
 
-before_script:
-    - mkdir -p ~/bin
-    # Required dependency for zunit
-    - curl -L "https://raw.githubusercontent.com/molovo/revolver/master/revolver" > ~/bin/revolver
-    - curl -L "https://github.com/molovo/zunit/releases/download/v0.8.2/zunit" > ~/bin/zunit
-    - chmod u+x ~/bin/{zunit,revolver}
+install:
+    - sudo bats-$VERSION/install.sh /usr/local
 
 script:
-    - shellcheck git-*
-    - zunit
+    - shellcheck "git-"*
+    - bats "tests/"*".bats"
