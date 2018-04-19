@@ -10,6 +10,7 @@ addons:
   apt:
     packages:
     - build-essential
+    - shellcheck
 
 before_install:
     - export LOCAL="$(mktemp --directory --tmpdir=${TMPDIR:/tmp} local.bin.XXXXXX)"
@@ -30,4 +31,5 @@ before_script:
     - chmod u+x ~/bin/{zunit,revolver}
 
 script:
+    - shellcheck git-*
     - zunit

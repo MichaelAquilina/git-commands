@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 delete_type="-d"
 
 [ "$1" = "-D" ] && delete_type="-D"
