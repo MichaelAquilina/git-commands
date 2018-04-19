@@ -8,8 +8,7 @@ else
     REMOTE="$DEFAULT_REMOTE"
 fi
 
-url="$(git remote get-url "$REMOTE")"
-if [[ "$?" != 0 ]]; then
+if ! url="$(git remote get-url "$REMOTE")"; then
     printf "available remotes:\n%s\n" "$(git remote)"
     exit 1
 fi
