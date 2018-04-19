@@ -30,7 +30,15 @@ fi
 
 if [[ -n "$target_url" ]]; then
     target_url="${target_url%.git}"
-    xdg-open "$target_url" 2>/dev/null
+
+    platform="$(uname)"
+    if [[ "$platform" = "Linux" ]]; then
+        xdg-open "$target_url" 2>/dev/null
+    elif [[ "$platform" = "Darwin" ]]; then
+        open "$target_url"
+    else
+        printf "Unknown target platform '%s'\n" "$platform"
+    fi
 else
     printf "Could not determine target url to open for '%s'\n" "$url"
     exit 3
