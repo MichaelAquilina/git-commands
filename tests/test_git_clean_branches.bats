@@ -2,7 +2,6 @@
 
 function setup {
     gcb="$PWD/git-clean-branches"
-    echo "$gcb"
     target="$(mktemp -d)"
     cd "$target"
 
