@@ -1,53 +1,57 @@
-#!/usr/bin/env zunit
+#!/usr/bin/env bats
 
-@setup {
-  gcb="$PWD/git-clean-branches"
-  target="$(mktemp -d)"
-  cd "$target"
+function setup {
+    gcb="$PWD/git-clean-branches"
+    echo "$gcb"
+    target="$(mktemp -d)"
+    cd "$target"
 
-  git init
+    git init
 
-
-  # Use a test configuration for committing
-  git config --local commit.gpgsign false
-  git config --local user.email "test@test.com"
-  git config --local user.name "Test User"
+    # Use a test configuration for committing
+    git config --local commit.gpgsign false
+    git config --local user.email "test@test.com"
+    git config --local user.name "Test User"
 }
 
 
-@teardown {
-  cd -
-  rm -rf "$target"
-  rm -rf "$target_bin"
-  PATH="$INITIAL_PATH"
+function teardown {
+    rm -rf "$target"
+}
+
+@test 'that this is working' {
+    run echo hello world
+
+    [ $status -eq 0 ]
+    [ "$output" = "hello world" ]
 }
 
 
 @test 'we are working in a git directory' {
-  run git status
+    run git status
 
-  assert $state equals 0
-  assert "$lines[1]" same_as "On branch master"
+    [ $status -eq 0 ]
+    [ "${lines[0]}" = "On branch master" ]
 }
 
 
 @test 'nothing removed on empty git dir' {
-  run "$gcb"
+    run "$gcb"
 
-  assert $state equals 0
-  assert "$output" is_empty
+    [ $status -eq 0 ]
+    [ -z "$output" ]
 }
 
 
 @test 'nothing deleted if no old branches exist' {
-  touch "hello.txt"
-  git add hello.txt
-  git commit -m "test commit"
+    touch "hello.txt"
+    git add hello.txt
+    git commit -m "test commit"
 
-  run "$gcb"
+    run "$gcb"
 
-  assert $state equals 0
-  assert "$output" is_empty
+    [ $status -eq 0 ]
+    [ -z "$output" ]
 }
 
 
@@ -60,8 +64,8 @@
 
   run "$gcb"
 
-  assert $state equals 0
-  assert "$output" same_as "Deleted branch empty_branch (was $commit_id)."
+  [ $status -eq 0 ]
+  [ "$output" = "Deleted branch empty_branch (was $commit_id)." ]
 }
 
 
@@ -78,8 +82,8 @@
 
   run "$gcb"
 
-  assert $state equals 0
-  assert "$output" is_empty
+  [ $status -eq 0 ]
+  [ -z "$output" ]
 }
 
 
@@ -105,6 +109,6 @@
 
   run "$gcb"
 
-  assert $state equals 0
-  assert "$output" same_as "Deleted branch merged_branch (was $commit_id)."
+  [ $status -eq 0 ]
+  [ "$output" = "Deleted branch merged_branch (was $commit_id)." ]
 }
