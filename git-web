@@ -38,8 +38,9 @@ if [[ -n "$target_url" ]]; then
         open "$target_url"
     else
         printf "Unknown target platform '%s'\n" "$platform"
+        exit 2
     fi
 else
-    printf "Could not determine target url to open for '%s'\n" "$url"
+    printf "Could not determine target url to open for '%s' (%s)\n" "$REMOTE" "$url"
     exit 3
 fi

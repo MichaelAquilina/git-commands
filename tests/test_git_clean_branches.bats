@@ -2,7 +2,6 @@
 
 function setup {
     gcb="$PWD/git-clean-branches"
-    echo "$gcb"
     target="$(mktemp -d)"
     cd "$target"
 
@@ -19,15 +18,7 @@ function teardown {
     rm -rf "$target"
 }
 
-@test 'that this is working' {
-    run echo hello world
-
-    [ $status -eq 0 ]
-    [ "$output" = "hello world" ]
-}
-
-
-@test 'we are working in a git directory' {
+@test 'git-clean-branches -> we are working in a git directory' {
     run git status
 
     [ $status -eq 0 ]
@@ -35,7 +26,7 @@ function teardown {
 }
 
 
-@test 'nothing removed on empty git dir' {
+@test 'git-clean-branches -> nothing removed on empty git dir' {
     run "$gcb"
 
     [ $status -eq 0 ]
@@ -43,7 +34,7 @@ function teardown {
 }
 
 
-@test 'nothing deleted if no old branches exist' {
+@test 'git-clean-branches -> nothing deleted if no old branches exist' {
     touch "hello.txt"
     git add hello.txt
     git commit -m "test commit"
@@ -55,7 +46,7 @@ function teardown {
 }
 
 
-@test 'cleans out branches with no commits' {
+@test 'git-clean-branches -> cleans out branches with no commits' {
   touch "hello.txt"
   git add hello.txt
   git commit -m "test commit"
@@ -69,7 +60,7 @@ function teardown {
 }
 
 
-@test 'does not clean out non-empty unmerged branches' {
+@test 'git-clean-branches -> does not clean out non-empty unmerged branches' {
   touch "hello.txt"
   git add hello.txt
   git commit -m "test commit"
@@ -87,7 +78,7 @@ function teardown {
 }
 
 
-@test 'does clean out non-empty merged branches' {
+@test 'git-clean-branches -> does clean out non-empty merged branches' {
   touch "hello.txt"
   git add hello.txt
   git commit -m "test commit"

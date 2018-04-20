@@ -19,4 +19,4 @@ install:
 
 script:
     - shellcheck "git-"*
-    - bats "tests/"*".bats"
+    - bats "tests/"
