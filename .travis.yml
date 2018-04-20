@@ -15,7 +15,7 @@ before_install:
     - tar -xf "v$VERSION.tar.gz"
 
 install:
-    - pip install restructuredtext_lint Pygments
+    - sudo pip install restructuredtext_lint Pygments
     - sudo bats-$VERSION/install.sh /usr/local
 
 script:
