@@ -1,4 +1,9 @@
-[![Build Status](https://travis-ci.org/MichaelAquilina/git-commands.svg?branch=master)](https://travis-ci.org/MichaelAquilina/git-commands)
+============
+Git Commands
+============
+
+
+|TravisCI| |GPLv3|
 
 Helper commands for git.
 
@@ -13,11 +18,11 @@ place `git-clean-branches` into any directory which is in your `$PATH`
 
 If you are using `zplug` on zsh then this can easily be done by adding the following to `~/.zshrc`
 
-```
-zplug "MichaelAquilina/git-commands", \
-    as:command, \
-    use:git-clean-branches
-```
+.. code:: shell
+
+    zplug "MichaelAquilina/git-commands", \
+        as:command, \
+        use:git-clean-branches
 
 git-web
 -------
@@ -30,8 +35,14 @@ place `git-web` into any directory which is in your `$PATH`
 
 If you are using `zplug` on zsh then this can easily be done by adding the following to `~/.zshrc`
 
-```
-zplug "MichaelAquilina/git-commands", \
-    as:command, \
-    use:git-web
-```
+.. code:: shell
+
+    zplug "MichaelAquilina/git-commands", \
+        as:command, \
+        use:git-web
+
+.. |TravisCI|  image:: https://travis-ci.org/MichaelAquilina/git-commands.svg?branch=master
+   :target: https://travis-ci.org/MichaelAquilina/git-commands
+
+.. |GPLv3|  image:: https://img.shields.io/badge/License-GPL%20v3-blue.svg
+   :target: https://www.gnu.org/licenses/gpl-3.0
