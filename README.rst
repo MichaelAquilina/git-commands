@@ -28,9 +28,10 @@ Force delete any branches that might be in an inconistent state:
 Installation
 ````````````
 
-place `git-clean-branches` into any directory which is in your `$PATH`
+place ``git-clean-branches`` into any directory which is in your ``$PATH``
 
-If you are using `zplug` on zsh then this can easily be done by adding the following to `~/.zshrc`
+Alternatively, if you are using ``zplug`` on zsh then this can easily be done by adding
+the following to ``~/.zshrc``:
 
 .. code:: shell
 
@@ -59,9 +60,10 @@ Open up web page for other specified remote:
 Installation
 ````````````
 
-place `git-web` into any directory which is in your `$PATH`
+place ``git-web`` into any directory which is in your ``$PATH``
 
-If you are using `zplug` on zsh then this can easily be done by adding the following to `~/.zshrc`
+Alternatively, if you are using ``zplug`` on zsh then this can easily be done by adding
+the following to ``~/.zshrc``:
 
 .. code:: shell
 
