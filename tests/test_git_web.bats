@@ -67,6 +67,7 @@ function teardown {
     [ "$output" = "Unknown target platform 'Hal9000'" ]
 }
 
+
 @test 'git web -> works with ssh remotes' {
     git remote add origin git@gitbuddy.com:SomeRepo/baz.git
 
@@ -107,4 +108,23 @@ function teardown {
 
     [ $status -eq 0 ]
     [ "$output" = "Opening https://github.com/MAquilina/git-web (Linux)" ]
+}
+
+@test 'git web -> --issues' {
+    git remote add origin git@kdgit.com:Warm/Gorm.git
+
+    run "$gw" "--issues"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://kdgit.com/Warm/Gorm/issues/ (Linux)" ]
+}
+
+@test 'git web -> --issues with specific remote' {
+    git remote add origin git@bitbucket.org:red/green.git
+    git remote add upstream git@gitlab.com:red/green.git
+
+    run "$gw" "--issues" "upstream"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://gitlab.com/red/green/issues/ (Linux)" ]
 }
