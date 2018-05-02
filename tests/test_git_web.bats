@@ -5,6 +5,7 @@ function setup {
     function uname {
         echo "Linux"
     }
+    # mock the functionality of xdg-open and open
     function xdg-open {
         echo "Opening $1 (Linux)"
     }
@@ -16,17 +17,18 @@ function setup {
     export -f xdg-open
     export -f uname
 
+    # Create easy way to target script
     gw="$PWD/git-web"
+
+    # Create test git directory
     target="$(mktemp -d)"
     cd "$target"
-
     git init
 
     # Use a test configuration for committing
     git config --local commit.gpgsign false
     git config --local user.email "test@test.com"
     git config --local user.name "Test User"
-
 }
 
 function teardown {
