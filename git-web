@@ -2,14 +2,21 @@
 
 DEFAULT_REMOTE="origin"
 
-if [[ -n "$1" ]]; then
-    REMOTE="$1"
-else
-    REMOTE="$DEFAULT_REMOTE"
-fi
+REMOTE="$DEFAULT_REMOTE"
+TARGET="home"
+
+for arg in "${@}"
+do
+    if [[ "$arg" == "--issues" ]]; then
+        TARGET="issues"
+    else
+        REMOTE="$arg"
+    fi
+done
 
 if ! url="$(git remote get-url "$REMOTE")"; then
-    printf "available remotes:\n%s\n" "$(git remote)"
+    printf "available remotes:\\n"
+    printf "%s\\n" "$(git remote)"
     exit 1
 fi
 
@@ -31,16 +38,20 @@ fi
 if [[ -n "$target_url" ]]; then
     target_url="${target_url%.git}"
 
+    if [[ "$TARGET" == "issues" ]]; then
+        target_url="$target_url/issues/"
+    fi
+
     platform="$(uname)"
     if [[ "$platform" = "Linux" ]]; then
         xdg-open "$target_url" 2>/dev/null
     elif [[ "$platform" = "Darwin" ]]; then
         open "$target_url"
     else
-        printf "Unknown target platform '%s'\n" "$platform"
+        printf "Unknown target platform '%s'\\n" "$platform"
         exit 2
     fi
 else
-    printf "Could not determine target url to open for '%s' (%s)\n" "$REMOTE" "$url"
+    printf "Could not determine target url to open for '%s' (%s)\\n" "$REMOTE" "$url"
     exit 3
 fi

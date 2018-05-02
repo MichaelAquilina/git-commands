@@ -5,6 +5,7 @@ function setup {
     function uname {
         echo "Linux"
     }
+    # mock the functionality of xdg-open and open
     function xdg-open {
         echo "Opening $1 (Linux)"
     }
@@ -16,17 +17,18 @@ function setup {
     export -f xdg-open
     export -f uname
 
+    # Create easy way to target script
     gw="$PWD/git-web"
+
+    # Create test git directory
     target="$(mktemp -d)"
     cd "$target"
-
     git init
 
     # Use a test configuration for committing
     git config --local commit.gpgsign false
     git config --local user.email "test@test.com"
     git config --local user.name "Test User"
-
 }
 
 function teardown {
@@ -66,6 +68,7 @@ function teardown {
     [ $status -eq 2 ]
     [ "$output" = "Unknown target platform 'Hal9000'" ]
 }
+
 
 @test 'git web -> works with ssh remotes' {
     git remote add origin git@gitbuddy.com:SomeRepo/baz.git
@@ -107,4 +110,23 @@ function teardown {
 
     [ $status -eq 0 ]
     [ "$output" = "Opening https://github.com/MAquilina/git-web (Linux)" ]
+}
+
+@test 'git web -> --issues' {
+    git remote add origin git@kdgit.com:Warm/Gorm.git
+
+    run "$gw" "--issues"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://kdgit.com/Warm/Gorm/issues/ (Linux)" ]
+}
+
+@test 'git web -> --issues with specific remote' {
+    git remote add origin git@bitbucket.org:red/green.git
+    git remote add upstream git@gitlab.com:red/green.git
+
+    run "$gw" "--issues" "upstream"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://gitlab.com/red/green/issues/ (Linux)" ]
 }
