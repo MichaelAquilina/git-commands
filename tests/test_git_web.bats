@@ -130,3 +130,39 @@ function teardown {
     [ $status -eq 0 ]
     [ "$output" = "Opening https://gitlab.com/red/green/issues/ (Linux)" ]
 }
+
+@test 'git web -> --pulls / github' {
+    git remote add origin git@github.com:Warm/Gorm.git
+
+    run "$gw" "--pulls"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://github.com/Warm/Gorm/pulls/ (Linux)" ]
+}
+
+@test 'git web -> --pulls / gitlab' {
+    git remote add origin git@gitlab.com:Warm/Gorm.git
+
+    run "$gw" "--pulls"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://gitlab.com/Warm/Gorm/merge-requests/ (Linux)" ]
+}
+
+@test 'git web -> --pulls / bitbucket' {
+    git remote add origin git@bitbucket.org:Warm/Gorm.git
+
+    run "$gw" "--pulls"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://bitbucket.org/Warm/Gorm/pull-requests/ (Linux)" ]
+}
+
+@test 'git web -> --pulls / unknown' {
+    git remote add origin git@blablagit.org:Warm/Gorm.git
+
+    run "$gw" "--pulls"
+
+    [ $status -eq 4 ]
+    [ "$output" = "Unknown platform for opening pull requests" ]
+}

@@ -1,5 +1,16 @@
 #!/bin/bash
 
+function pulls_path {
+    HOST="$1"
+    if [[ "$HOST" == "https://gitlab.com"* ]]; then
+        printf "merge-requests/"
+    elif [[ "$HOST" == *"https://github.com"* ]]; then
+        printf "pulls/"
+    elif [[ "$HOST" == "https://bitbucket.org"* ]]; then
+        printf "pull-requests/"
+    fi
+}
+
 DEFAULT_REMOTE="origin"
 
 REMOTE="$DEFAULT_REMOTE"
@@ -9,6 +20,8 @@ for arg in "${@}"
 do
     if [[ "$arg" == "--issues" ]]; then
         TARGET="issues"
+    elif [[ "$arg" == "--pulls" ]]; then
+        TARGET="pulls"
     else
         REMOTE="$arg"
     fi
@@ -40,6 +53,13 @@ if [[ -n "$target_url" ]]; then
 
     if [[ "$TARGET" == "issues" ]]; then
         target_url="$target_url/issues/"
+    elif [[ "$TARGET" == "pulls" ]]; then
+        p="$(pulls_path "$target_url")"
+        if [[ -z "$p" ]]; then
+            printf "Unknown platform for opening pull requests\\n"
+            exit 4
+        fi
+        target_url="$target_url/$p"
     fi
 
     platform="$(uname)"

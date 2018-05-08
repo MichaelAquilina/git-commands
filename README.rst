@@ -57,6 +57,18 @@ Open up web page for other specified remote:
 
     git web upstream
 
+Open up the issues page:
+
+.. code:: shell
+
+    git web --issues
+
+Open up pull requests:
+
+.. code:: shell
+
+    git web --pulls
+
 Installation
 ````````````
 
