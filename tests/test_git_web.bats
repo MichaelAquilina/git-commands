@@ -169,6 +169,7 @@ function teardown {
 
     run "$gw" "--pulls"
 
-    [ $status -eq 4 ]
-    [ "$output" = "Unknown platform for opening pull requests" ]
+    [ $status -eq 0 ]
+    [ "${lines[0]}" = "Unknown platform for opening pull requests. Default: Github" ]
+    [ "${lines[1]}" = "Opening https://blablagit.org/Warm/Gorm/pulls/ (Linux)" ]
 }
