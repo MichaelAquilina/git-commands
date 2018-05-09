@@ -115,10 +115,13 @@ function teardown {
 @test 'git web -> --issues' {
     git remote add origin git@kdgit.com:Warm/Gorm.git
 
-    run "$gw" "--issues"
+    for param in "--issues" "-i"
+    do
+       run "$gw" "$param"
 
-    [ $status -eq 0 ]
-    [ "$output" = "Opening https://kdgit.com/Warm/Gorm/issues/ (Linux)" ]
+        [ $status -eq 0 ]
+        [ "$output" = "Opening https://kdgit.com/Warm/Gorm/issues/ (Linux)" ]
+    done
 }
 
 @test 'git web -> --issues with specific remote' {
@@ -134,10 +137,13 @@ function teardown {
 @test 'git web -> --pulls / github' {
     git remote add origin git@github.com:Warm/Gorm.git
 
-    run "$gw" "--pulls"
+    for param in "--pulls" "-p"
+    do
+        run "$gw" "$param"
 
-    [ $status -eq 0 ]
-    [ "$output" = "Opening https://github.com/Warm/Gorm/pulls/ (Linux)" ]
+        [ $status -eq 0 ]
+        [ "$output" = "Opening https://github.com/Warm/Gorm/pulls/ (Linux)" ]
+    done
 }
 
 @test 'git web -> --pulls / gitlab' {

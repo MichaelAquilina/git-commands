@@ -18,9 +18,9 @@ TARGET="home"
 
 for arg in "${@}"
 do
-    if [[ "$arg" == "--issues" ]]; then
+    if [[ "$arg" == "--issues" ]] || [[ "$arg" == "-i" ]]; then
         TARGET="issues"
-    elif [[ "$arg" == "--pulls" ]]; then
+    elif [[ "$arg" == "--pulls" ]] || [[ "$arg" == "-p" ]]; then
         TARGET="pulls"
     else
         REMOTE="$arg"
