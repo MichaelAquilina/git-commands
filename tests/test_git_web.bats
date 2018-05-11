@@ -141,6 +141,7 @@ function teardown {
     do
         run "$gw" "$param"
 
+        echo "$output"
         [ $status -eq 0 ]
         [ "$output" = "Opening https://github.com/Warm/Gorm/pulls/ (Linux)" ]
     done
@@ -164,12 +165,33 @@ function teardown {
     [ "$output" = "Opening https://bitbucket.org/Warm/Gorm/pull-requests/ (Linux)" ]
 }
 
-@test 'git web -> --pulls / unknown' {
+@test 'git web -> --pulls / custom configured' {
+    git config --local web.pulls.git.example.com "mypulls/"
+    git remote add origin git@git.example.com:Apple/Orange.git
+
+    run "$gw" "--pulls"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://git.example.com/Apple/Orange/mypulls/ (Linux)" ]
+}
+
+@test 'git web -> --pulls / configured default' {
+    git config --local web.pulls.default "pull-requests/"
+    git remote add origin git@git.foo.com:Apple/Orange.git
+
+    run "$gw" "--pulls"
+
+    echo "$output"
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://git.foo.com/Apple/Orange/pull-requests/ (Linux)" ]
+}
+
+
+@test 'git web -> --pulls / unknown unconfigured default' {
     git remote add origin git@blablagit.org:Warm/Gorm.git
 
     run "$gw" "--pulls"
 
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "Unknown platform for opening pull requests. Default: Github" ]
-    [ "${lines[1]}" = "Opening https://blablagit.org/Warm/Gorm/pulls/ (Linux)" ]
+    [ "$output" = "Opening https://blablagit.org/Warm/Gorm/pulls/ (Linux)" ]
 }
