@@ -144,7 +144,7 @@ function teardown {
     [ "$output" = "Opening https://git.example.com/Apple/Orange/myissues/ (Linux)" ]
 }
 
-@test 'git web -> --pulls / configured default' {
+@test 'git web -> --issues/ configured default' {
     git config --local web.issues.default "issue-tracker/"
     git remote add origin git@git.foo.com:Apple/Orange.git
 
@@ -156,7 +156,7 @@ function teardown {
 }
 
 
-@test 'git web -> --pulls / unknown unconfigured default' {
+@test 'git web -> --issues/ unknown unconfigured default' {
     git remote add origin git@blablagit.org:Warm/Gorm.git
 
     run "$gw" "--issues"
