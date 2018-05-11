@@ -134,6 +134,36 @@ function teardown {
     [ "$output" = "Opening https://gitlab.com/red/green/issues/ (Linux)" ]
 }
 
+@test 'git web -> --issues / custom configured' {
+    git config --local web.issues.git.example.com "myissues/"
+    git remote add origin git@git.example.com:Apple/Orange.git
+
+    run "$gw" "--issues"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://git.example.com/Apple/Orange/myissues/ (Linux)" ]
+}
+
+@test 'git web -> --pulls / configured default' {
+    git config --local web.issues.default "issue-tracker/"
+    git remote add origin git@git.foo.com:Apple/Orange.git
+
+    run "$gw" "--issues"
+
+    echo "$output"
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://git.foo.com/Apple/Orange/issue-tracker/ (Linux)" ]
+}
+
+
+@test 'git web -> --pulls / unknown unconfigured default' {
+    git remote add origin git@blablagit.org:Warm/Gorm.git
+
+    run "$gw" "--issues"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://blablagit.org/Warm/Gorm/issues/ (Linux)" ]
+}
 @test 'git web -> --pulls / github' {
     git remote add origin git@github.com:Warm/Gorm.git
 

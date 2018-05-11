@@ -18,6 +18,24 @@ function pulls_path {
     fi
 }
 
+function issues_path {
+    DOMAIN="$1"
+    if [[ "$DOMAIN" == "gitlab.com" ]]; then
+        printf "issues/"
+    elif [[ "$DOMAIN" == "github.com" ]]; then
+        printf "issues/"
+    elif [[ "$DOMAIN" == "bitbucket.org" ]]; then
+        printf "issues/"
+    elif target="$(git config "web.issues.$DOMAIN")"; then
+        printf "%s" "$target"
+    elif target="$(git config web.issues.default)"; then
+        printf "%s" "$target"
+    else
+        # if all else fails, assume its github
+        printf "issues/"
+    fi
+}
+
 function get_domain {
     URL="$1"
     # shellcheck disable=SC2003
@@ -73,7 +91,9 @@ if [[ -n "$target_url" ]]; then
     target_url="${target_url%.git}"
 
     if [[ "$TARGET" == "issues" ]]; then
-        target_url="$target_url/issues/"
+        domain="$(get_domain "$target_url")"
+        p="$(issues_path "$domain")"
+        target_url="$target_url/$p"
     elif [[ "$TARGET" == "pulls" ]]; then
         domain="$(get_domain "$target_url")"
         p="$(pulls_path "$domain")"
