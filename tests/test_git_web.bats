@@ -35,6 +35,13 @@ function teardown {
     rm -rf "$target"
 }
 
+@test 'git-web -> --help' {
+    run "$gw" "--help"
+
+    [ $status -eq 0 ]
+    [ "${lines[0]}" = "git-web opens up a browser with the relevant http page for your repository" ]
+}
+
 @test 'git-web -> exits on missing remote' {
     run "$gw" idontexist
 
