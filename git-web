@@ -61,12 +61,18 @@ do
         TARGET="issues"
     elif [[ "$arg" == "--pulls" ]] || [[ "$arg" == "-p" ]]; then
         TARGET="pulls"
+    elif [[ "$arg" == "--help" ]] || [[ "$arg" == "-h" ]]; then
+        printf "PRINT HELP\\n"
+        exit 0
+    elif [[ "$arg" == "--"* ]] || [[ "$arg" == "-"* ]]; then
+        printf "UNKNOWN ARGUMENT"
+        exit 5
     else
         REMOTE="$arg"
     fi
 done
 
-if ! url="$(git remote get-url "$REMOTE")"; then
+if ! url="$(git remote get-url "$REMOTE" 2>/dev/null)"; then
     printf "available remotes:\\n"
     printf "%s\\n" "$(git remote)"
     exit 1
