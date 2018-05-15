@@ -74,6 +74,9 @@ do
     elif [[ "$arg" == "--help" ]] || [[ "$arg" == "-h" ]]; then
         print_help
         exit 0
+    elif [[ "$arg" == "--"* ]] || [[ "$arg" == "-"* ]]; then
+        printf "Invalid Option: %s\\n" "$arg"
+        exit 1
     else
         REMOTE="$arg"
     fi
