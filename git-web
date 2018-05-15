@@ -49,6 +49,16 @@ function get_domain {
     printf "%s" "$URL"
 }
 
+function print_help {
+    printf "git-web opens up a browser with the relevant http page for your repository\\n"
+    printf "\\n"
+    printf "Usage: git web <remote> [--pulls|--issues]\\n"
+    printf "\\n"
+    printf -- "--help / -h      print this help message\\n"
+    printf -- "--pulls / -p     open the pull requests web page\\n"
+    printf -- "--issues / -i    open the issues web page\\n"
+}
+
 
 DEFAULT_REMOTE="origin"
 
@@ -61,6 +71,12 @@ do
         TARGET="issues"
     elif [[ "$arg" == "--pulls" ]] || [[ "$arg" == "-p" ]]; then
         TARGET="pulls"
+    elif [[ "$arg" == "--help" ]] || [[ "$arg" == "-h" ]]; then
+        print_help
+        exit 0
+    elif [[ "$arg" == "--"* ]] || [[ "$arg" == "-"* ]]; then
+        printf "Invalid Option: %s\\n" "$arg"
+        exit 1
     else
         REMOTE="$arg"
     fi

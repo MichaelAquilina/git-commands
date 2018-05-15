@@ -35,6 +35,33 @@ function teardown {
     rm -rf "$target"
 }
 
+@test 'git-web -> --help' {
+    for param in "--help" "-h"
+    do
+        run "$gw" "$param"
+
+        [ $status -eq 0 ]
+        [ "${lines[0]}" = "git-web opens up a browser with the relevant http page for your repository" ]
+    done
+}
+
+@test 'git-web -> invalid option' {
+    for param in "--foo" "-f"
+    do
+        run "$gw" "$param"
+
+        [ $status -eq 1 ]
+        [ "$output" = "Invalid Option: $param" ]
+    done
+}
+
+@test 'git-web -> invalid option mixed with valid option' {
+    run "$gw" "--issues" "--foo"
+
+    [ $status -eq 1 ]
+    [ "$output" = "Invalid Option: --foo" ]
+}
+
 @test 'git-web -> exits on missing remote' {
     run "$gw" idontexist
 
