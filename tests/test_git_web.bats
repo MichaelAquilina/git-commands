@@ -162,7 +162,7 @@ function teardown {
 }
 
 @test 'git web -> --issues / custom configured' {
-    git config --local web.issues.git.example.com "myissues/"
+    git config --local web.git.example.com.issues "myissues/"
     git remote add origin git@git.example.com:Apple/Orange.git
 
     run "$gw" "--issues"
@@ -172,7 +172,7 @@ function teardown {
 }
 
 @test 'git web -> --issues/ configured default' {
-    git config --local web.issues.default "issue-tracker/"
+    git config --local web.default.issues "issue-tracker/"
     git remote add origin git@git.foo.com:Apple/Orange.git
 
     run "$gw" "--issues"
@@ -223,7 +223,7 @@ function teardown {
 }
 
 @test 'git web -> --pulls / custom configured' {
-    git config --local web.pulls.git.example.com "mypulls/"
+    git config --local web.git.example.com.pulls "mypulls/"
     git remote add origin git@git.example.com:Apple/Orange.git
 
     run "$gw" "--pulls"
@@ -233,7 +233,7 @@ function teardown {
 }
 
 @test 'git web -> --pulls / configured default' {
-    git config --local web.pulls.default "pull-requests/"
+    git config --local web.default.pulls "pull-requests/"
     git remote add origin git@git.foo.com:Apple/Orange.git
 
     run "$gw" "--pulls"
