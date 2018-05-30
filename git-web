@@ -8,9 +8,9 @@ function pulls_path {
         printf "pulls/"
     elif [[ "$DOMAIN" == "bitbucket.org" ]]; then
         printf "pull-requests/"
-    elif target="$(git config "web.pulls.$DOMAIN")"; then
+    elif target="$(git config "web.$DOMAIN.pulls")"; then
         printf "%s" "$target"
-    elif target="$(git config web.pulls.default)"; then
+    elif target="$(git config web.default.pulls)"; then
         printf "%s" "$target"
     else
         # if all else fails, assume its github
@@ -26,9 +26,9 @@ function issues_path {
         printf "issues/"
     elif [[ "$DOMAIN" == "bitbucket.org" ]]; then
         printf "issues/"
-    elif target="$(git config "web.issues.$DOMAIN")"; then
+    elif target="$(git config "web.$DOMAIN.issues")"; then
         printf "%s" "$target"
-    elif target="$(git config web.issues.default)"; then
+    elif target="$(git config web.default.issues)"; then
         printf "%s" "$target"
     else
         # if all else fails, assume its github
