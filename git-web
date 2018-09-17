@@ -18,6 +18,12 @@ function pulls_path {
     fi
 }
 
+function pull_request_path {
+    DOMAIN="$1"
+    # Right now, we just assume github no matter what
+    printf "pull/new/%s/" "$(git rev-parse --abbrev-ref HEAD)"
+}
+
 function issues_path {
     DOMAIN="$1"
     if [[ "$DOMAIN" == "gitlab.com" ]]; then
@@ -52,11 +58,12 @@ function get_domain {
 function print_help {
     printf "git-web opens up a browser with the relevant http page for your repository\\n"
     printf "\\n"
-    printf "Usage: git web <remote> [--pulls|--issues]\\n"
+    printf "Usage: git web <remote> [--pulls|--issues|--pull-request]\\n"
     printf "\\n"
-    printf -- "--help / -h      print this help message\\n"
-    printf -- "--pulls / -p     open the pull requests web page\\n"
-    printf -- "--issues / -i    open the issues web page\\n"
+    printf -- "--help / -h            print this help message\\n"
+    printf -- "--pulls / -p           open the pull requests web page\\n"
+    printf -- "--pull-request / -pr   open pull request for current branch\\n"
+    printf -- "--issues / -i          open the issues web page\\n"
 }
 
 
@@ -71,6 +78,8 @@ do
         TARGET="issues"
     elif [[ "$arg" == "--pulls" ]] || [[ "$arg" == "-p" ]]; then
         TARGET="pulls"
+    elif [[ "$arg" == "--pull-request" ]] || [[ "$arg" == "-pr" ]]; then
+        TARGET="pull_request"
     elif [[ "$arg" == "--help" ]] || [[ "$arg" == "-h" ]]; then
         print_help
         exit 0
@@ -113,6 +122,10 @@ if [[ -n "$target_url" ]]; then
     elif [[ "$TARGET" == "pulls" ]]; then
         domain="$(get_domain "$target_url")"
         p="$(pulls_path "$domain")"
+        target_url="$target_url/$p"
+    elif [[ "$TARGET" == "pull_request" ]]; then
+        domain="$(get_domain "$target_url")"
+        p="$(pull_request_path "$domain")"
         target_url="$target_url/$p"
     fi
 
