@@ -24,6 +24,9 @@ function setup {
     target="$(mktemp -d)"
     cd "$target"
     git init
+    touch "empty.txt"
+    git add empty.txt
+    git commit -m "Initial Commit"
 
     # Use a test configuration for committing
     git config --local commit.gpgsign false
@@ -137,6 +140,19 @@ function teardown {
 
     [ $status -eq 0 ]
     [ "$output" = "Opening https://github.com/MAquilina/git-web (Linux)" ]
+}
+
+@test 'git web -> --pull-request' {
+    git remote add origin git@mygit.com:KillaW0lf04/Some-2D-RPG.git
+    git checkout -b "my_cheeky_branch"
+
+    for param in "--pull-request" "-pr"
+    do
+       run "$gw" "$param"
+
+        [ $status -eq 0 ]
+        [ "$output" = "Opening https://mygit.com/KillaW0lf04/Some-2D-RPG/pull/new/my_cheeky_branch/ (Linux)" ]
+    done
 }
 
 @test 'git web -> --issues' {

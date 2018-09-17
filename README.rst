@@ -63,11 +63,17 @@ Open up the issues page:
 
     git web --issues
 
-Open up pull requests:
+Open up all open pull requests:
 
 .. code:: shell
 
     git web --pulls
+
+Open new pull request for current branch:
+
+.. code:: shell
+
+    git web --pull-request
 
 Installation
 ````````````
