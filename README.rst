@@ -7,37 +7,8 @@ Git Commands
 
 Helper commands for git.
 
-git-clean-branches
-==================
-
-Cleans (delete) any branches that have been been merged into master. This should make
-your life easier when figuring out which local branches are no longer important.
-
-Delete all local branches that have been merged into master:
-
-.. code:: shell
-
-    git clean-branches
-
-Force delete any branches that might be in an inconistent state:
-
-.. code:: shell
-
-    git clean-branches -D
-
-Installation
-````````````
-
-place ``git-clean-branches`` into any directory which is in your ``$PATH``
-
-Alternatively, if you are using ``zplug`` on zsh then this can easily be done by adding
-the following to ``~/.zshrc``:
-
-.. code:: shell
-
-    zplug "MichaelAquilina/git-commands", \
-        as:command, \
-        use:git-clean-branches
+* git-web_
+* git-clean-branches_
 
 git-web
 =======
@@ -88,6 +59,40 @@ the following to ``~/.zshrc``:
     zplug "MichaelAquilina/git-commands", \
         as:command, \
         use:git-web
+
+
+git-clean-branches
+==================
+
+Cleans (delete) any branches that have been been merged into master. This should make
+your life easier when figuring out which local branches are no longer important.
+
+Delete all local branches that have been merged into master:
+
+.. code:: shell
+
+    git clean-branches
+
+Force delete any branches that might be in an inconistent state:
+
+.. code:: shell
+
+    git clean-branches -D
+
+Installation
+````````````
+
+place ``git-clean-branches`` into any directory which is in your ``$PATH``
+
+Alternatively, if you are using ``zplug`` on zsh then this can easily be done by adding
+the following to ``~/.zshrc``:
+
+.. code:: shell
+
+    zplug "MichaelAquilina/git-commands", \
+        as:command, \
+        use:git-clean-branches
+
 
 .. |TravisCI|  image:: https://travis-ci.org/MichaelAquilina/git-commands.svg?branch=master
    :target: https://travis-ci.org/MichaelAquilina/git-commands
