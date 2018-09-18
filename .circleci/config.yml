@@ -21,6 +21,19 @@ test: &test
 
 
 jobs:
+  lint:
+    docker:
+      - image: "debian:stretch"
+    steps:
+      - checkout
+      - run:
+          name: install shellcheck
+          command: |
+            apt-get update && apt-get install -y shellcheck
+      - run:
+          name: run shellcheck
+          command: shellcheck git-*
+
   test-3.1:
     docker:
       - image: "bash:3.1"
@@ -41,6 +54,7 @@ workflows:
   version: 2
   git_commands_test:
     jobs:
+      - lint
       - test-3.1
       - test-3.2
       - test-4.4
