@@ -3,7 +3,7 @@ Git Commands
 ============
 
 
-|TravisCI| |GPLv3|
+|CircleCI| |GPLv3|
 
 Helper commands for git.
 
@@ -94,8 +94,8 @@ the following to ``~/.zshrc``:
         use:git-clean-branches
 
 
-.. |TravisCI|  image:: https://travis-ci.org/MichaelAquilina/git-commands.svg?branch=master
-   :target: https://travis-ci.org/MichaelAquilina/git-commands
+.. |CircleCI| image:: https://circleci.com/gh/MichaelAquilina/git-commands.svg?style=svg
+   :target: https://circleci.com/gh/MichaelAquilina/git-commands
 
 .. |GPLv3|  image:: https://img.shields.io/badge/License-GPL%20v3-blue.svg
    :target: https://www.gnu.org/licenses/gpl-3.0
