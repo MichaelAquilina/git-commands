@@ -34,11 +34,6 @@ jobs:
           name: run shellcheck
           command: shellcheck git-*
 
-  test-3.1:
-    docker:
-      - image: "bash:3.1"
-    <<: *test
-
   test-3.2:
     docker:
       - image: "bash:3.2"
@@ -59,7 +54,6 @@ workflows:
   git_commands_test:
     jobs:
       - lint
-      - test-3.1
       - test-3.2
       - test-4.4
       - test-5.0
