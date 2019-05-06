@@ -1,5 +1,9 @@
 #!/bin/bash
 
+function open_command {
+    printf "%s" "$(git config web.opencommand)"
+}
+
 function pulls_path {
     DOMAIN="$1"
     if [[ "$DOMAIN" == "gitlab.com" ]]; then
@@ -130,7 +134,11 @@ if [[ -n "$target_url" ]]; then
     fi
 
     platform="$(uname)"
-    if [[ "$platform" = "Linux" ]]; then
+    open_command="$(open_command)"
+
+    if [[ -n "$open_command" ]]; then
+        "$open_command" "$target_url"
+    elif [[ "$platform" = "Linux" ]]; then
         xdg-open "$target_url" 2>/dev/null
     elif [[ "$platform" = "Darwin" ]]; then
         open "$target_url"

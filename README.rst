@@ -46,6 +46,19 @@ Open new pull request for current branch:
 
     git web --pull-request
 
+Configution
+```````````
+
+``git config web.opencommand``: Set the command to use when opening urls by setting
+
+``git config web.default.pulls``: Default url path to use for pull requests
+
+``git config web.default.issues``: Default url path to use for issues
+
+``git config web.$DOMAIN.pulls``: Path to use for pull requests for ``$DOMAIN``
+
+``git config web.$DOMAIN.issues``: Path to use for issues for ``$DOMAIN``
+
 Installation
 ````````````
 

@@ -29,6 +29,7 @@ function setup {
     git commit -m "Initial Commit"
 
     # Use a test configuration for committing
+    git config --local web.opencommand ""
     git config --local commit.gpgsign false
     git config --local user.email "test@test.com"
     git config --local user.name "Test User"
@@ -99,6 +100,20 @@ function teardown {
     [ "$output" = "Unknown target platform 'Hal9000'" ]
 }
 
+@test 'git web -> custom command used when set' {
+    git remote add origin git@gitbuddy.com:Repo1/foobar.git
+    git config --local web.opencommand customcommand
+
+    function customcommand {
+        echo "I am a custom command $1"
+    }
+    export -f customcommand
+
+    run "$gw"
+
+    [ $status -eq 0 ]
+    [ "$output" = "I am a custom command https://gitbuddy.com/Repo1/foobar" ]
+}
 
 @test 'git web -> works with ssh remotes' {
     git remote add origin git@gitbuddy.com:SomeRepo/baz.git
