@@ -1,10 +1,16 @@
 #!/bin/bash
 delete_type="-d"
+target="master"
 
-[ "$1" = "-D" ] && delete_type="-D"
+if [[ "$1" == "-D" ]]; then
+    delete_type="-D"
+elif [[ -n "$1" ]]; then
+    target="$1"
+fi
+
 [ -z "$(git branch)" ] && exit
 
-git branch --merged "master"| grep -v "master" | while read -r branch;
+git branch --merged "$target"| grep -v "$target" | while read -r branch;
 do
     git branch "$delete_type" "${branch}"
 done
