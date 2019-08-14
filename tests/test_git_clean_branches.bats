@@ -77,6 +77,33 @@ function teardown {
   [ -z "$output" ]
 }
 
+@test 'git-clean-branches -> different default target' {
+  touch "hello.txt"
+  git checkout -b develop
+  git add hello.txt
+  git commit -m "test commit"
+
+  # Start off a new branch
+  git checkout -b merged_branch
+  echo hello > "hello.txt"
+  git commit -am "updated commit"
+  commit_id="$(git rev-parse --short merged_branch)"
+
+  git checkout develop
+
+  # make sure its not simplified into a rebase
+  echo "hello" > hello2.txt
+  git add .
+  git commit -m "develop commit"
+
+  git merge merged_branch
+
+  run "$gcb" develop
+
+  [ $status -eq 0 ]
+  [ "$output" = "Deleted branch merged_branch (was $commit_id)." ]
+}
+
 
 @test 'git-clean-branches -> does clean out non-empty merged branches' {
   touch "hello.txt"
