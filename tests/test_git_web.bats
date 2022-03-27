@@ -78,7 +78,7 @@ function teardown {
     [ -z "${lines[2]}" ]
 }
 
-@test 'git web -> exits on unknown remote format' {
+@test 'git-web -> exits on unknown remote format' {
     git remote add bad "yellow://badformat"
 
     run "$gw" bad
@@ -87,7 +87,7 @@ function teardown {
     [ "$output" = "Could not determine target url to open for 'bad' (yellow://badformat)" ]
 }
 
-@test 'git web -> exits on unknown target platform' {
+@test 'git-web -> exits on unknown target platform' {
     git remote add origin git@gitbuddy.com:Repo1/foobar.git
 
     function uname {
@@ -101,7 +101,7 @@ function teardown {
     [ "$output" = "Unknown target platform 'Hal9000'" ]
 }
 
-@test 'git web -> custom command used when set' {
+@test 'git-web -> custom command used when set' {
     git remote add origin git@gitbuddy.com:Repo1/foobar.git
     git config --local web.opencommand customcommand
 
@@ -116,7 +116,7 @@ function teardown {
     [ "$output" = "I am a custom command https://gitbuddy.com/Repo1/foobar" ]
 }
 
-@test 'git web -> works with ssh remotes' {
+@test 'git-web -> works with ssh remotes' {
     git remote add origin git@gitbuddy.com:SomeRepo/baz.git
 
     run "$gw"
@@ -125,7 +125,7 @@ function teardown {
     [ "$output" = "Opening https://gitbuddy.com/SomeRepo/baz (Linux)" ]
 }
 
-@test 'git web -> works with https remotes' {
+@test 'git-web -> works with https remotes' {
     git remote add origin https://gitwarrior.com/power/bar.git
 
     run "$gw"
@@ -134,7 +134,7 @@ function teardown {
     [ "$output" = "Opening https://gitwarrior.com/power/bar (Linux)" ]
 }
 
-@test 'git web -> works with osx' {
+@test 'git-web -> works with osx' {
     git remote add origin https://gitapple.com/red/blue.git
 
     function uname {
@@ -158,7 +158,7 @@ function teardown {
     [ "$output" = "Opening https://github.com/MAquilina/git-web (Linux)" ]
 }
 
-@test 'git web -> --pull-request' {
+@test 'git-web -> --pull-request' {
     git remote add origin git@mygit.com:KillaW0lf04/Some-2D-RPG.git
     git checkout -b "my_cheeky_branch"
 
@@ -171,7 +171,7 @@ function teardown {
     done
 }
 
-@test 'git web -> --issues' {
+@test 'git-web -> --issues' {
     git remote add origin git@kdgit.com:Warm/Gorm.git
 
     for param in "--issues" "-i"
@@ -183,7 +183,7 @@ function teardown {
     done
 }
 
-@test 'git web -> --issues with specific remote' {
+@test 'git-web -> --issues with specific remote' {
     git remote add origin git@bitbucket.org:red/green.git
     git remote add upstream git@gitlab.com:red/green.git
 
@@ -193,7 +193,7 @@ function teardown {
     [ "$output" = "Opening https://gitlab.com/red/green/issues/ (Linux)" ]
 }
 
-@test 'git web -> --issues / custom configured' {
+@test 'git-web -> --issues / custom configured' {
     git config --local web.git.example.com.issues "myissues/"
     git remote add origin git@git.example.com:Apple/Orange.git
 
@@ -203,7 +203,7 @@ function teardown {
     [ "$output" = "Opening https://git.example.com/Apple/Orange/myissues/ (Linux)" ]
 }
 
-@test 'git web -> --issues/ configured default' {
+@test 'git-web -> --issues/ configured default' {
     git config --local web.default.issues "issue-tracker/"
     git remote add origin git@git.foo.com:Apple/Orange.git
 
@@ -215,7 +215,7 @@ function teardown {
 }
 
 
-@test 'git web -> --issues/ unknown unconfigured default' {
+@test 'git-web -> --issues/ unknown unconfigured default' {
     git remote add origin git@blablagit.org:Warm/Gorm.git
 
     run "$gw" "--issues"
@@ -223,7 +223,7 @@ function teardown {
     [ $status -eq 0 ]
     [ "$output" = "Opening https://blablagit.org/Warm/Gorm/issues/ (Linux)" ]
 }
-@test 'git web -> --pulls / github' {
+@test 'git-web -> --pulls / github' {
     git remote add origin git@github.com:Warm/Gorm.git
 
     for param in "--pulls" "-p"
@@ -236,7 +236,7 @@ function teardown {
     done
 }
 
-@test 'git web -> --pulls / gitlab' {
+@test 'git-web -> --pulls / gitlab' {
     git remote add origin git@gitlab.com:Warm/Gorm.git
 
     run "$gw" "--pulls"
@@ -245,7 +245,7 @@ function teardown {
     [ "$output" = "Opening https://gitlab.com/Warm/Gorm/merge-requests/ (Linux)" ]
 }
 
-@test 'git web -> --pulls / bitbucket' {
+@test 'git-web -> --pulls / bitbucket' {
     git remote add origin git@bitbucket.org:Warm/Gorm.git
 
     run "$gw" "--pulls"
@@ -254,7 +254,7 @@ function teardown {
     [ "$output" = "Opening https://bitbucket.org/Warm/Gorm/pull-requests/ (Linux)" ]
 }
 
-@test 'git web -> --pulls / custom configured' {
+@test 'git-web -> --pulls / custom configured' {
     git config --local web.git.example.com.pulls "mypulls/"
     git remote add origin git@git.example.com:Apple/Orange.git
 
@@ -264,7 +264,7 @@ function teardown {
     [ "$output" = "Opening https://git.example.com/Apple/Orange/mypulls/ (Linux)" ]
 }
 
-@test 'git web -> --pulls / configured default' {
+@test 'git-web -> --pulls / configured default' {
     git config --local web.default.pulls "pull-requests/"
     git remote add origin git@git.foo.com:Apple/Orange.git
 
@@ -276,7 +276,7 @@ function teardown {
 }
 
 
-@test 'git web -> --pulls / unknown unconfigured default' {
+@test 'git-web -> --pulls / unknown unconfigured default' {
     git remote add origin git@blablagit.org:Warm/Gorm.git
 
     run "$gw" "--pulls"
