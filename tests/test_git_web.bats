@@ -73,7 +73,7 @@ function teardown {
     echo "$output"
 
     [ $status -eq 1 ]
-    [ "${lines[0]}" = "fatal: No such remote 'idontexist'" ]
+    [ "${lines[0]}" = "error: No such remote 'idontexist'" ]
     [ "${lines[1]}" = "available remotes:" ]
     [ -z "${lines[2]}" ]
 }
