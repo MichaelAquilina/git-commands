@@ -24,15 +24,16 @@ function setup {
     target="$(mktemp -d)"
     cd "$target"
     git init
-    touch "empty.txt"
-    git add empty.txt
-    git commit -m "Initial Commit"
 
     # Use a test configuration for committing
     git config --local web.opencommand ""
     git config --local commit.gpgsign false
     git config --local user.email "test@test.com"
     git config --local user.name "Test User"
+
+    touch "empty.txt"
+    git add empty.txt
+    git commit -m "Initial Commit"
 }
 
 function teardown {
