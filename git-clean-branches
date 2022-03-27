@@ -1,6 +1,7 @@
 #!/bin/bash
 delete_type="-d"
-target="master"
+target="$(git config init.defaultBranch)"
+target="${target:-master}"
 
 if [[ "$1" == "-D" ]]; then
     delete_type="-D"
@@ -10,7 +11,7 @@ fi
 
 [ -z "$(git branch)" ] && exit
 
-git branch --merged "$target"| grep -v "$target" | while read -r branch;
+git branch --merged "$target" | grep -v "$target" | while read -r branch;
 do
     git branch "$delete_type" "${branch}"
 done

@@ -5,9 +5,12 @@ function setup {
     target="$(mktemp -d)"
     cd "$target"
 
+    # Use a test configuration for committing
     git init
 
-    # Use a test configuration for committing
+    defaultBranch="$(git config init.defaultBranch)"
+    main="${defaultBranch:-master}"
+
     git config --local commit.gpgsign false
     git config --local user.email "test@test.com"
     git config --local user.name "Test User"
@@ -22,7 +25,7 @@ function teardown {
     run git status
 
     [ $status -eq 0 ]
-    [ "${lines[0]}" = "On branch master" ]
+    [ "${lines[0]}" = "On branch ${main}" ]
 }
 
 
@@ -69,7 +72,7 @@ function teardown {
   echo hello > "hello.txt"
   git commit -am "updated commit"
 
-  git checkout master
+  git checkout "${main}"
 
   run "$gcb"
 
@@ -116,7 +119,7 @@ function teardown {
   git commit -am "updated commit"
   commit_id="$(git rev-parse --short merged_branch)"
 
-  git checkout master
+  git checkout "${main}"
 
   # make sure its not simplified into a rebase
   echo "hello" > hello2.txt
