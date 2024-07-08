@@ -1,0 +1,10 @@
+#!/bin/bash
+# Automatically figures out the default branch by checking with the upstream remote
+
+# default remote is considered to be origin unless specified
+local remote="$1"
+remote="${remote:-origin}"
+
+local long_branch_name="$(git symbolic-ref --short refs/remotes/$remote/HEAD)"
+local branch_name="${long_branch_name##*/}"
+printf "${branch_name}\n"
