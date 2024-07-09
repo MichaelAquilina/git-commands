@@ -9,6 +9,7 @@ Helper commands for git.
 
 * git-web_
 * git-clean-branches_
+* git-default-branch_
 
 git-web
 =======
@@ -91,6 +92,29 @@ Force delete any branches that might be in an inconistent state:
 .. code:: shell
 
     git clean-branches -D
+
+
+git-default-branch
+==================
+
+Prints out the default branch of the repository (typically main or master) by querying
+the HEAD of the origin remote.
+
+This is a useful command to have when used in combination with other functions and aliases
+you might have.
+
+For example, the alias below would fail on any repositories which do not use main as the
+default branch.
+
+.. code:: shell
+
+    alias grim="git rebase -i main
+
+However we can change this to use `git-default-branch` to make it work for any repository:
+
+.. code:: shell
+
+    alias grim="git rebase -i $$(git default-branch)"
 
 Installation
 ````````````
