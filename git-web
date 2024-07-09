@@ -48,11 +48,11 @@ function issues_path {
 
 function get_domain {
     URL="$1"
-    # shellcheck disable=SC2003
+    # shellcheck disable=SC2003,SC2308
     delimiter="$(expr index "$URL" ://)"
 
     URL="${URL:$delimiter+2}"
-    # shellcheck disable=SC2003
+    # shellcheck disable=SC2003,SC2308
     delimiter="$(expr index "$URL" /)"
 
     URL="${URL:0:$delimiter-1}"
@@ -104,6 +104,7 @@ fi
 if [[ "$url" = "git@"* ]]; then
     url="${url#git@}"
 
+    # shellcheck disable=SC2308
     delimiter="$(expr index "$url" :)"
 
     domain="${url:0:$delimiter-1}"
