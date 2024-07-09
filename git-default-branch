@@ -5,6 +5,6 @@
 remote="$1"
 remote="${remote:-origin}"
 
-long_branch_name="$(git symbolic-ref --short refs/remotes/$remote/HEAD)"
+long_branch_name="$(git symbolic-ref --short refs/remotes/"$remote"/HEAD)"
 branch_name="${long_branch_name##*/}"
-printf "${branch_name}\n"
+printf "%s\n" "${branch_name}"
