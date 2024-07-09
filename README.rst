@@ -108,7 +108,7 @@ default branch.
 
 .. code:: shell
 
-    alias grim="git rebase -i main
+    alias grim="git rebase -i main"
 
 However we can change this to use `git-default-branch` to make it work for any repository:
 
