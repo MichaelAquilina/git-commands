@@ -38,6 +38,7 @@ function setup {
 
 function teardown {
     rm -rf "$target"
+    unset -f type
 }
 
 @test 'git-web -> --help' {
@@ -140,17 +141,13 @@ function teardown {
     function type() {
         return 1
     }
-    function printf() {
-        "Called printf $1"
-    }
     export -f type
     export -f uname
-    export -f printf
 
     run "$gw"
 
     [ $status -eq 0 ]
-    [ "$output" = "Called printf https://gitapple.com/red/blue" ]
+    [ "$output" = "url: https://gitapple.com/red/blue" ]
 }
 
 @test 'git-web -> works with osx' {
@@ -233,7 +230,6 @@ function teardown {
     [ "$output" = "Opening https://git.foo.com/Apple/Orange/issue-tracker/ (Linux)" ]
 }
 
-
 @test 'git-web -> --issues/ unknown unconfigured default' {
     git remote add origin git@blablagit.org:Warm/Gorm.git
 
@@ -242,6 +238,7 @@ function teardown {
     [ $status -eq 0 ]
     [ "$output" = "Opening https://blablagit.org/Warm/Gorm/issues/ (Linux)" ]
 }
+
 @test 'git-web -> --pulls / github' {
     git remote add origin git@github.com:Warm/Gorm.git
 
