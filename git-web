@@ -140,7 +140,7 @@ if [[ -n "$target_url" ]]; then
     if [[ -n "$open_command" ]]; then
         "$open_command" "$target_url"
     elif [[ "$platform" = "Linux" ]]; then
-        if type xdg-open > /dev/null; then
+        if type xdg-open > /dev/null 2>&1; then
             xdg-open "$target_url" 2>/dev/null
         else
             printf "$target_url\n"
