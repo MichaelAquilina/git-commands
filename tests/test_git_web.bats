@@ -134,6 +134,25 @@ function teardown {
     [ "$output" = "Opening https://gitwarrior.com/power/bar (Linux)" ]
 }
 
+@test 'git-web -> prints when xdg-open not available' {
+    git remote add origin https://gitapple.com/red/blue.git
+
+    function type() {
+        return 1
+    }
+    function printf() {
+        "Called printf $1"
+    }
+    export -f type
+    export -f uname
+    export -f printf
+
+    run "$gw"
+
+    [ $status -eq 0 ]
+    [ "$output" = "Called printf https://gitapple.com/red/blue" ]
+}
+
 @test 'git-web -> works with osx' {
     git remote add origin https://gitapple.com/red/blue.git
 
