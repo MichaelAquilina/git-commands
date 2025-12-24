@@ -47,6 +47,13 @@ Open new pull request for current branch:
 
     git web --pull-request
 
+Open commit history
+
+.. code:: shell
+
+   git web --commits
+
+
 Configution
 ```````````
 

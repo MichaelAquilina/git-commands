@@ -22,6 +22,25 @@ function pulls_path {
     fi
 }
 
+function commits_path {
+    DOMAIN="$1"
+    if [[ "$DOMAIN" == "gitlab.com" ]]; then
+        prinf "-/commits/"
+    elif [[ "$DOMAIN" == "github.com" ]]; then
+        printf "commits/"
+    elif [[ "$DOMAIN" == "bitbucket.org" ]]; then
+        printf "commits/"
+    elif target="$(git config "web.$DOMAIN.commits")"; then
+        printf "%s" "$target"
+    elif target="$(git config web.default.commits)"; then
+        printf "%s" "$target"
+    else
+        # if all else fails, assume its github
+        printf "commits/"
+    fi
+
+}
+
 function pull_request_path {
     DOMAIN="$1"
     # Right now, we just assume github no matter what
@@ -68,6 +87,7 @@ function print_help {
     printf -- "--pulls / -p           open the pull requests web page\\n"
     printf -- "--pull-request / -pr   open pull request for current branch\\n"
     printf -- "--issues / -i          open the issues web page\\n"
+    printf -- "--commits / -c         open commit history\\n"
 }
 
 
@@ -84,6 +104,8 @@ do
         TARGET="pulls"
     elif [[ "$arg" == "--pull-request" ]] || [[ "$arg" == "-pr" ]]; then
         TARGET="pull_request"
+    elif [[ "$arg" == "--commits" ]] || [[ "$arg" == "-c" ]]; then
+        TARGET="commits"
     elif [[ "$arg" == "--help" ]] || [[ "$arg" == "-h" ]]; then
         print_help
         exit 0
@@ -131,6 +153,10 @@ if [[ -n "$target_url" ]]; then
     elif [[ "$TARGET" == "pull_request" ]]; then
         domain="$(get_domain "$target_url")"
         p="$(pull_request_path "$domain")"
+        target_url="$target_url/$p"
+    elif [[ "$TARGET" == "commits" ]]; then
+        domain="$(get_domain "$target_url")"
+        p="$(commits_path "$domain")"
         target_url="$target_url/$p"
     fi
 
