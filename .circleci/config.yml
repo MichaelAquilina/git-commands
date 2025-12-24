@@ -50,6 +50,11 @@ jobs:
       - image: "bash:5.0"
     <<: *test
 
+  test-5.3:
+    docker:
+      - image: "bash:5.3"
+    <<: *test
+
 workflows:
   version: 2
   git_commands_test:
@@ -58,3 +63,4 @@ workflows:
       - test-3.2
       - test-4.4
       - test-5.0
+      - test-5.3
