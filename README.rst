@@ -59,13 +59,17 @@ Configution
 
 ``git config web.opencommand``: Set the command to use when opening urls by setting
 
-``git config web.default.pulls``: Default url path to use for pull requests
+``git config web.default.pulls``: Default fallback url path to use for pull requests
 
-``git config web.default.issues``: Default url path to use for issues
+``git config web.default.issues``: Default fallback url path to use for issues
+
+``git config web.default.commits``: Default fallback url path to use for commits
 
 ``git config web.$DOMAIN.pulls``: Path to use for pull requests for ``$DOMAIN``
 
 ``git config web.$DOMAIN.issues``: Path to use for issues for ``$DOMAIN``
+
+``git cofnig web.$DOMAIN.commits``: Path to use for commit history for ``$DOMAIN``
 
 Installation
 ````````````
