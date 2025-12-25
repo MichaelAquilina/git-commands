@@ -142,6 +142,15 @@ the following to ``~/.zshrc``:
         use:git-clean-branches
 
 
+git-rollback
+============
+
+Provides a convenient interactive wrapper around `git reflog` to rollback (reset --hard)
+to previous commits.
+
+Requires `fzf` and `cut` to be installed.
+
+
 .. |CircleCI| image:: https://circleci.com/gh/MichaelAquilina/git-commands.svg?style=svg
    :target: https://circleci.com/gh/MichaelAquilina/git-commands
 
