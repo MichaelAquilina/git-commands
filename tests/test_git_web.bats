@@ -199,6 +199,18 @@ function teardown {
     done
 }
 
+@test 'git-web -> --commits' {
+    git remote add origin git@moogit.com:southern/reach.git
+
+    for param in "--commits" "-c"
+    do
+       run "$gw" "$param"
+
+        [ $status -eq 0 ]
+        [ "$output" = "Opening https://moogit.com/southern/reach/commits/ (Linux)" ]
+    done
+}
+
 @test 'git-web -> --issues with specific remote' {
     git remote add origin git@bitbucket.org:red/green.git
     git remote add upstream git@gitlab.com:red/green.git
