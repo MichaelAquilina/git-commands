@@ -10,6 +10,9 @@ Helper commands for git.
 * git-web_
 * git-clean-branches_
 * git-default-branch_
+* git-rollback_
+
+Copy any of these commands in to your "$PATH" to make them accessible as a git subcommand
 
 git-web
 =======
@@ -69,22 +72,7 @@ Configution
 
 ``git config web.$DOMAIN.issues``: Path to use for issues for ``$DOMAIN``
 
-``git cofnig web.$DOMAIN.commits``: Path to use for commit history for ``$DOMAIN``
-
-Installation
-````````````
-
-place ``git-web`` into any directory which is in your ``$PATH``
-
-Alternatively, if you are using ``zplug`` on zsh then this can easily be done by adding
-the following to ``~/.zshrc``:
-
-.. code:: shell
-
-    zplug "MichaelAquilina/git-commands", \
-        as:command, \
-        use:git-web
-
+``git config web.$DOMAIN.commits``: Path to use for commit history for ``$DOMAIN``
 
 git-clean-branches
 ==================
@@ -127,19 +115,18 @@ However we can change this to use `git-default-branch` to make it work for any r
 
     alias grim="git rebase -i $$(git default-branch)"
 
-Installation
-````````````
+git-rollback
+============
 
-place ``git-clean-branches`` into any directory which is in your ``$PATH``
+Provides a convenient interactive wrapper around `git reflog` to rollback (via `git reset`).
 
-Alternatively, if you are using ``zplug`` on zsh then this can easily be done by adding
-the following to ``~/.zshrc``:
+Accepts and passes through any arguments to the resulting `git reset` command
 
 .. code:: shell
 
-    zplug "MichaelAquilina/git-commands", \
-        as:command, \
-        use:git-clean-branches
+    git rollback         # performs the default mixed reset on selected commit
+    git rollback --hard  # performs a hard reset on selected commit
+    git rollback -p      # performs an interactive patch reset on selected commit
 
 
 .. |CircleCI| image:: https://circleci.com/gh/MichaelAquilina/git-commands.svg?style=svg
