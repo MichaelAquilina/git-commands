@@ -1,7 +1,12 @@
 #!/bin/bash
 delete_type="-d"
-target="$(git config init.defaultBranch)"
-target="${target:-master}"
+
+if type git-default-branch > /dev/null 2>&1; then
+    target="$(git default-branch)"
+else
+    target="$(git config init.defaultBranch)"
+    target="${target:-master}"
+fi
 
 if [[ "$1" == "-D" ]]; then
     delete_type="-D"
