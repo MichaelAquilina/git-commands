@@ -1,0 +1,68 @@
+#!/bin/bash
+
+set -e
+
+url="$(git web --api --print)"
+
+if [[ -n "$1" ]]; then
+    ref="$1"
+else
+    ref="$(git rev-parse HEAD)"
+fi
+
+function github_api_request {
+    local url="$1"
+    local ref="$2"
+    local response
+
+    curl_args=(
+        -L --silent
+        -H "Accept: application/vnd.github+json"
+        -H "X-GitHub-Api-Version: 2022-11-28"
+    )
+
+    if [[ "$GITHUB_API_KEY" ]]; then
+        curl_args+=(-H "Authorization: Bearer $GITHUB_API_KEY")
+    fi
+
+    response="$(curl "${curl_args[@]}" "${url}/commits/${ref}/status")"
+
+    message="$(jq -r '.message' <<< "$response")"
+    if [[ "$message" == "API rate limit exceeded"* ]]; then
+        printf "%s\n" "$message"
+    else
+        formatting='"\(.state): (Overall)", (.statuses[] | "\(.state): \u001b]8;;\(.target_url)\u001b\\\(.context)\u001b]8;;\u001b\\")'
+        output="$(jq -r "$formatting" <<< "$response")"
+        printf "%s" "$output"
+    fi
+}
+
+function print_status_line {
+    local line="$1"
+    local color=""
+    local GREEN="\e[32m"
+    local BEIGE="\e[33m"
+    local RED="\e[31m"
+    local NC="\e[0m"
+
+    if [[ "$line" == "success: "* ]]; then
+        color="$GREEN"
+    elif [[ "$line" == "pending: "* ]]; then
+        color="$BEIGE"
+    elif [[ "$line" == "failure: "* ]]; then
+        color="$RED"
+    elif [[ "$line" == "error: "* ]];  then
+        color="$BEIGE"
+    fi
+
+    printf "$color%s$NC\n" "$line"
+}
+
+if [[ "$url" == "https://api.github.com/"* ]]; then
+    output="$(github_api_request "$url" "$ref")"
+    while IFS= read -r line; do
+        print_status_line "$line"
+    done <<< "$output"
+else
+    printf "Unknown API for %s\n" "$(git web --print)"
+fi
