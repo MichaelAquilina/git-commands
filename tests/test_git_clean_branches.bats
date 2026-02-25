@@ -16,7 +16,6 @@ function setup {
     git config --local user.name "Test User"
 }
 
-
 function teardown {
     rm -rf "$target"
 }

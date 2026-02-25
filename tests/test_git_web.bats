@@ -164,6 +164,14 @@ function teardown {
     [ "$output" = "Opening https://gitapple.com/red/blue (OSX)" ]
 }
 
+@test 'git-web -> --print' {
+    git remote add origin git@guitar.org:hum/dum
+
+    run "$gw" --print
+    [ $status -eq 0 ]
+    [ "$output" = "https://guitar.org/hum/dum" ]
+}
+
 @test 'git-web -> specify different remote' {
     git remote add origin git@gitbuddy.com:SomeRepo/baz.git
     git remote add upstream git@github.com:MAquilina/git-web.git
@@ -172,6 +180,15 @@ function teardown {
 
     [ $status -eq 0 ]
     [ "$output" = "Opening https://github.com/MAquilina/git-web (Linux)" ]
+}
+
+@test 'git-web -> --api' {
+    git remote add origin git@github.com:foobar/bazbang.git
+
+    run "$gw" --api
+
+    [ $status -eq 0 ]
+    [ "$output" = "Opening https://api.github.com/repos/foobar/bazbang (Linux)" ]
 }
 
 @test 'git-web -> --pull-request' {

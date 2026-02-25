@@ -38,7 +38,6 @@ function commits_path {
         # if all else fails, assume its github
         printf "commits/"
     fi
-
 }
 
 function pull_request_path {
@@ -67,15 +66,89 @@ function issues_path {
 
 function get_domain {
     URL="$1"
-    # shellcheck disable=SC2003,SC2308
-    delimiter="$(expr index "$URL" ://)"
 
-    URL="${URL:$delimiter+2}"
     # shellcheck disable=SC2003,SC2308
     delimiter="$(expr index "$URL" /)"
 
     URL="${URL:0:$delimiter-1}"
     printf "%s" "$URL"
+}
+
+function open_url() {
+    local target_url="$1"
+    local platform
+    local open_command
+
+    platform="$(uname)"
+    open_command="$(open_command)"
+
+    if [[ -n "$open_command" ]]; then
+        "$open_command" "$target_url"
+    elif [[ "$platform" = "Linux" ]]; then
+        if type xdg-open > /dev/null 2>&1; then
+            xdg-open "$target_url" 2>/dev/null
+        else
+            printf "url: %s\n" "$target_url"
+        fi
+    elif [[ "$platform" = "Darwin" ]]; then
+        open "$target_url"
+    else
+        printf "Unknown target platform '%s'\\n" "$platform"
+        exit 2
+    fi
+}
+
+function get_target_url() {
+    local url="$2"
+    local TARGET="$1"
+
+    local target_url
+    local repo
+    local domain
+    local delimiter
+
+    if [[ "$url" = "git@"* ]]; then
+        url="${url#git@}"
+
+        # shellcheck disable=SC2308
+        delimiter="$(expr index "$url" :)"
+
+        domain="${url:0:$delimiter-1}"
+        repo="${url:$delimiter}"
+        repo="${repo%.git}"
+    elif [[ "$url" = "http"* ]]; then
+        url="${url#http://}"
+        url="${url#https://}"
+
+        # shellcheck disable=SC2308
+        delimiter="$(expr index "$url" /)"
+
+        domain="${url:0:$delimiter-1}"
+        repo="${url:$delimiter}"
+        repo="${repo%.git}"
+    fi
+
+    if [[ -n "$domain" ]] && [[ -n "$repo" ]]; then
+
+        if [[ "$TARGET" == "issues" ]]; then
+            p="$(issues_path "$domain")"
+            target_url="$domain/$repo/$p"
+        elif [[ "$TARGET" == "pulls" ]]; then
+            p="$(pulls_path "$domain")"
+            target_url="$domain/$repo/$p"
+        elif [[ "$TARGET" == "pull_request" ]]; then
+            p="$(pull_request_path "$domain")"
+            target_url="$domain/$repo/$p"
+        elif [[ "$TARGET" == "commits" ]]; then
+            p="$(commits_path "$domain")"
+            target_url="$domain/$repo/$p"
+        elif [[ "$TARGET" == "api" ]]; then
+            target_url="api.$domain/repos/$repo"
+        else
+            target_url="$domain/$repo"
+        fi
+        printf "https://%s" "$target_url"
+    fi
 }
 
 function print_help {
@@ -95,11 +168,16 @@ DEFAULT_REMOTE="origin"
 
 REMOTE="$DEFAULT_REMOTE"
 TARGET="home"
+MODE="open"
 
 for arg in "${@}"
 do
     if [[ "$arg" == "--issues" ]] || [[ "$arg" == "-i" ]]; then
         TARGET="issues"
+    elif [[ "$arg" == "--print" ]] || [[ "$arg" == "-P" ]]; then
+        MODE="print"
+    elif [[ "$arg" == "--api" ]]; then
+        TARGET="api"
     elif [[ "$arg" == "--pulls" ]] || [[ "$arg" == "-p" ]]; then
         TARGET="pulls"
     elif [[ "$arg" == "--pull-request" ]] || [[ "$arg" == "-pr" ]]; then
@@ -117,65 +195,22 @@ do
     fi
 done
 
+
 if ! url="$(git remote get-url "$REMOTE")"; then
     printf "available remotes:\\n"
     printf "%s\\n" "$(git remote)"
     exit 1
 fi
 
-if [[ "$url" = "git@"* ]]; then
-    url="${url#git@}"
-
-    # shellcheck disable=SC2308
-    delimiter="$(expr index "$url" :)"
-
-    domain="${url:0:$delimiter-1}"
-    path="${url:$delimiter}"
-
-    target_url="https://$domain/$path"
-
-elif [[ "$url" = "http"* ]]; then
-    target_url="$url"
-
-fi
+target_url="$(get_target_url "$TARGET" "$url")"
 
 if [[ -n "$target_url" ]]; then
-    target_url="${target_url%.git}"
-
-    if [[ "$TARGET" == "issues" ]]; then
-        domain="$(get_domain "$target_url")"
-        p="$(issues_path "$domain")"
-        target_url="$target_url/$p"
-    elif [[ "$TARGET" == "pulls" ]]; then
-        domain="$(get_domain "$target_url")"
-        p="$(pulls_path "$domain")"
-        target_url="$target_url/$p"
-    elif [[ "$TARGET" == "pull_request" ]]; then
-        domain="$(get_domain "$target_url")"
-        p="$(pull_request_path "$domain")"
-        target_url="$target_url/$p"
-    elif [[ "$TARGET" == "commits" ]]; then
-        domain="$(get_domain "$target_url")"
-        p="$(commits_path "$domain")"
-        target_url="$target_url/$p"
-    fi
-
-    platform="$(uname)"
-    open_command="$(open_command)"
-
-    if [[ -n "$open_command" ]]; then
-        "$open_command" "$target_url"
-    elif [[ "$platform" = "Linux" ]]; then
-        if type xdg-open > /dev/null 2>&1; then
-            xdg-open "$target_url" 2>/dev/null
-        else
-            printf "url: %s\n" "$target_url"
-        fi
-    elif [[ "$platform" = "Darwin" ]]; then
-        open "$target_url"
+    if [[ "$MODE" == "print" ]]; then
+        printf "%s\n" "$target_url"
+    elif [[ "$MODE" == "open" ]]; then
+        open_url "$target_url"
     else
-        printf "Unknown target platform '%s'\\n" "$platform"
-        exit 2
+        printf "Unknown mode selected: %s\n" "$MODE"
     fi
 else
     printf "Could not determine target url to open for '%s' (%s)\\n" "$REMOTE" "$url"
