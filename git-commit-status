@@ -21,19 +21,22 @@ function github_api_request {
         -H "X-GitHub-Api-Version: 2022-11-28"
     )
 
-    if [[ "$GITHUB_API_KEY" ]]; then
+    if [[ -n "$GITHUB_API_KEY" ]]; then
         curl_args+=(-H "Authorization: Bearer $GITHUB_API_KEY")
     fi
 
     response="$(curl "${curl_args[@]}" "${url}/commits/${ref}/status")"
+    status="$(jq -r '.status' <<< "$response")"
 
-    message="$(jq -r '.message' <<< "$response")"
-    if [[ "$message" == "API rate limit exceeded"* ]]; then
-        printf "%s\n" "$message"
+    if [[ "$status" != "null" ]]; then
+        message="$(jq -r '.message' <<< "$response")"
+        printf "%s: %s\n" "$status" "$message"
     else
         formatting='"\(.state): (Overall)", (.statuses[] | "\(.state): \u001b]8;;\(.target_url)\u001b\\\(.context)\u001b]8;;\u001b\\")'
         output="$(jq -r "$formatting" <<< "$response")"
-        printf "%s" "$output"
+        while IFS= read -r line; do
+            print_status_line "$line"
+        done <<< "$output"
     fi
 }
 
@@ -59,10 +62,7 @@ function print_status_line {
 }
 
 if [[ "$url" == "https://api.github.com/"* ]]; then
-    output="$(github_api_request "$url" "$ref")"
-    while IFS= read -r line; do
-        print_status_line "$line"
-    done <<< "$output"
+    github_api_request "$url" "$ref"
 else
     printf "Unknown API for %s\n" "$(git web --print)"
 fi
