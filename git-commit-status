@@ -10,12 +10,9 @@ else
     ref="$(git rev-parse HEAD)"
 fi
 
-function github_api_request {
-    local url="$1"
-    local ref="$2"
-    local response
-
-    curl_args=(
+function curl_github {
+    local endpoint="$1"
+    local curl_args=(
         -L --silent
         -H "Accept: application/vnd.github+json"
         -H "X-GitHub-Api-Version: 2022-11-28"
@@ -25,15 +22,52 @@ function github_api_request {
         curl_args+=(-H "Authorization: Bearer $GITHUB_API_KEY")
     fi
 
-    response="$(curl "${curl_args[@]}" "${url}/commits/${ref}/status")"
+    curl "${curl_args[@]}" "$endpoint"
+}
+
+function github_status_request {
+    local url="$1"
+    local ref="$2"
+    local response
+
+    response="$(curl_github "${url}/commits/${ref}/status")"
     status="$(jq -r '.status' <<< "$response")"
 
     if [[ "$status" != "null" ]]; then
         message="$(jq -r '.message' <<< "$response")"
         printf "%s: %s\n" "$status" "$message"
     else
-        formatting='"\(.state): (Overall)", (.statuses[] | "\(.state): \u001b]8;;\(.target_url)\u001b\\\(.context)\u001b]8;;\u001b\\")'
+        formatting='"(.statuses[] | "\(.state): \u001b]8;;\(.target_url)\u001b\\\(.context)\u001b]8;;\u001b\\")'
         output="$(jq -r "$formatting" <<< "$response")"
+        while IFS= read -r line; do
+            print_status_line "$line"
+        done <<< "$output"
+    fi
+}
+
+function github_check_runs_request {
+    local url="$1"
+    local ref="$2"
+    local response
+
+    response="$(curl_github "${url}/commits/${ref}/check-runs")"
+    status="$(jq -r '.message' <<< "$response")"
+
+    if [[ "$status" != "null" ]]; then
+        printf "%s: %s\n" "$(jq -r '.status' <<< "$response")" "$status"
+        return
+    fi
+
+    formatting='.check_runs[] | (
+        if .status != "completed" then "pending"
+        elif .conclusion == "success" then "success"
+        elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
+        else "neutral"
+        end
+    ) + ": \u001b]8;;\(.html_url)\u001b\\\(.name)\u001b]8;;\u001b\\"'
+
+    output="$(jq -r "$formatting" <<< "$response")"
+    if [[ -n "$output" ]]; then
         while IFS= read -r line; do
             print_status_line "$line"
         done <<< "$output"
@@ -62,7 +96,8 @@ function print_status_line {
 }
 
 if [[ "$url" == "https://api.github.com/"* ]]; then
-    github_api_request "$url" "$ref"
+    github_status_request "$url" "$ref"
+    github_check_runs_request "$url" "$ref"
 else
     printf "Unknown API for %s\n" "$(git web --print)"
 fi
