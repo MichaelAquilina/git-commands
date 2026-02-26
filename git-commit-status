@@ -37,10 +37,10 @@ function github_status_request {
         message="$(jq -r '.message' <<< "$response")"
         printf "%s: %s\n" "$status" "$message"
     else
-        formatting='"(.statuses[] | "\(.state): \u001b]8;;\(.target_url)\u001b\\\(.context)\u001b]8;;\u001b\\")'
+        formatting='.statuses[] | "\(.state)\t\u001b]8;;\(.target_url)\u001b\\\(.state): \(.context)\u001b]8;;\u001b\\"'
         output="$(jq -r "$formatting" <<< "$response")"
-        while IFS= read -r line; do
-            print_status_line "$line"
+        while IFS=$'\t' read -r state line; do
+            print_status_line "$state" "$line"
         done <<< "$output"
     fi
 }
@@ -58,37 +58,40 @@ function github_check_runs_request {
         return
     fi
 
-    formatting='.check_runs[] | (
-        if .status != "completed" then "pending"
+    # variables in jq triggering false positive lint error
+    # shellcheck disable=SC2016
+    formatting='.check_runs[] |
+        (if .status != "completed" then "pending"
         elif .conclusion == "success" then "success"
         elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
         else "neutral"
-        end
-    ) + ": \u001b]8;;\(.html_url)\u001b\\\(.name)\u001b]8;;\u001b\\"'
+        end) as $state |
+        "\($state)\t\u001b]8;;\(.html_url)\u001b\\\($state): \(.name)\u001b]8;;\u001b\\"'
 
     output="$(jq -r "$formatting" <<< "$response")"
     if [[ -n "$output" ]]; then
-        while IFS= read -r line; do
-            print_status_line "$line"
+        while IFS=$'\t' read -r state line; do
+            print_status_line "$state" "$line"
         done <<< "$output"
     fi
 }
 
 function print_status_line {
-    local line="$1"
+    local state="$1"
+    local line="$2"
     local color=""
     local GREEN="\e[32m"
     local BEIGE="\e[33m"
     local RED="\e[31m"
     local NC="\e[0m"
 
-    if [[ "$line" == "success: "* ]]; then
+    if [[ "$state" == "success" ]]; then
         color="$GREEN"
-    elif [[ "$line" == "pending: "* ]]; then
+    elif [[ "$state" == "pending" ]]; then
         color="$BEIGE"
-    elif [[ "$line" == "failure: "* ]]; then
+    elif [[ "$state" == "failure" ]]; then
         color="$RED"
-    elif [[ "$line" == "error: "* ]];  then
+    elif [[ "$state" == "error" ]]; then
         color="$BEIGE"
     fi
 
