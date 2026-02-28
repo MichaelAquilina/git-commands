@@ -25,7 +25,7 @@ function teardown {
 }
 
 
-@test 'gracefully handle errors' {
+@test 'git-commit-status -> gracefully handle errors' {
     git remote add origin git@github.com:test/test.git
     function curl {
         printf '{"status": "404", "message": "Not Found"}'
@@ -38,7 +38,7 @@ function teardown {
     [ "$output" == "404: Not Found" ]
 }
 
-@test 'warns for unsupported providers' {
+@test 'git-commit-status -> warns for unsupported providers' {
     git remote add origin git@gitlab.com:test/test.git
 
     run git commit-status
