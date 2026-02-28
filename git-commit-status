@@ -2,6 +2,11 @@
 
 set -e
 
+if ! type jq >/dev/null; then
+    printf "jq is required to run git commit-status"
+    exit 1
+fi
+
 url="$(git web --api --print)"
 
 if [[ -n "$1" ]]; then
