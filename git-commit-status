@@ -10,6 +10,14 @@ else
     ref="$(git rev-parse HEAD)"
 fi
 
+function get_github_api_key() {
+    if [[ -n "$GITHUB_API_KEY_PASS_NAME" ]]; then
+        printf "%s" "$(pass show "$GITHUB_API_KEY_PASS_NAME" | head -1)"
+    elif  [[ -n "$GITHUB_API_KEY" ]]; then
+        printf "%s" "$GITHUB_API_KEY"
+    fi
+}
+
 function curl_github {
     local endpoint="$1"
     local curl_args=(
@@ -17,9 +25,11 @@ function curl_github {
         -H "Accept: application/vnd.github+json"
         -H "X-GitHub-Api-Version: 2022-11-28"
     )
+    local github_api_key
+    github_api_key="$(get_github_api_key)"
 
-    if [[ -n "$GITHUB_API_KEY" ]]; then
-        curl_args+=(-H "Authorization: Bearer $GITHUB_API_KEY")
+    if [[ -n "$github_api_key" ]]; then
+        curl_args+=(-H "Authorization: Bearer $github_api_key")
     fi
 
     curl "${curl_args[@]}" "$endpoint"
