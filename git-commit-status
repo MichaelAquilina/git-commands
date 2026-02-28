@@ -112,5 +112,5 @@ if [[ "$url" == "https://api.github.com/"* ]]; then
     github_status_request "$url" "$ref"
     github_check_runs_request "$url" "$ref"
 else
-    printf "Unknown API for %s\n" "$(git web --print)"
+    printf "Unknown or unsupported API for %s\n" "$(git web --print)"
 fi
