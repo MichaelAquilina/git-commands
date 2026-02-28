@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 function setup {
-    export PATH="$PWD:$PATH"
+    gcb="$PWD/git-clean-branches"
     target="$(mktemp -d)"
     cd "$target"
 
@@ -29,7 +29,7 @@ function teardown {
 
 
 @test 'git-clean-branches -> nothing removed on empty git dir' {
-    run git clean-branches
+    run "$gcb"
 
     [ $status -eq 0 ]
     [ -z "$output" ]
@@ -41,7 +41,7 @@ function teardown {
     git add hello.txt
     git commit -m "test commit"
 
-    run git clean-branches
+    run "$gcb"
 
     [ $status -eq 0 ]
     [ -z "$output" ]
@@ -55,7 +55,7 @@ function teardown {
   git branch empty_branch
   commit_id="$(git rev-parse --short empty_branch)"
 
-  run git clean-branches
+  run "$gcb"
 
   [ $status -eq 0 ]
   [ "$output" = "Deleted branch empty_branch (was $commit_id)." ]
@@ -73,7 +73,7 @@ function teardown {
 
   git checkout "${main}"
 
-  run git clean-branches
+  run "$gcb"
 
   [ $status -eq 0 ]
   [ -z "$output" ]
@@ -100,7 +100,7 @@ function teardown {
 
   git merge merged_branch
 
-  run git clean-branches develop
+  run "$gcb" develop
 
   [ $status -eq 0 ]
   [ "$output" = "Deleted branch merged_branch (was $commit_id)." ]
@@ -127,7 +127,7 @@ function teardown {
 
   git merge merged_branch
 
-  run git clean-branches
+  run "$gcb"
 
   [ $status -eq 0 ]
   [ "$output" = "Deleted branch merged_branch (was $commit_id)." ]
