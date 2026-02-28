@@ -1,5 +1,11 @@
 function setup {
     gcs="$PWD/git-commit-status"
+    gw="$PWD/git-web"
+
+    function git-web {
+        "$gw"
+    }
+    export -f git-web
 
     # Create test git directory
     target="$(mktemp -d)"
