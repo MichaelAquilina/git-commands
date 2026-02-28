@@ -46,6 +46,7 @@ function github_status_request {
     if [[ "$status" != "null" ]]; then
         message="$(jq -r '.message' <<< "$response")"
         printf "%s: %s\n" "$status" "$message"
+        return 1
     else
         formatting='.statuses[] | "\(.state)\t\u001b]8;;\(.target_url)\u001b\\\(.state): \(.context)\u001b]8;;\u001b\\"'
         output="$(jq -r "$formatting" <<< "$response")"
@@ -65,7 +66,7 @@ function github_check_runs_request {
 
     if [[ "$status" != "null" ]]; then
         printf "%s: %s\n" "$(jq -r '.status' <<< "$response")" "$status"
-        return
+        return 1
     fi
 
     # variables in jq triggering false positive lint error
@@ -109,8 +110,12 @@ function print_status_line {
 }
 
 if [[ "$url" == "https://api.github.com/"* ]]; then
-    github_status_request "$url" "$ref"
-    github_check_runs_request "$url" "$ref"
+    if ! github_status_request "$url" "$ref"; then
+        exit 1
+    elif ! github_check_runs_request "$url" "$ref"; then
+        exit 1
+    fi
 else
     printf "Unknown or unsupported API for %s\n" "$(git web --print)"
+    exit 1
 fi
