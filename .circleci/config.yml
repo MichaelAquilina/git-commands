@@ -18,7 +18,7 @@ test: &test
     - run:
         name: Run tests
         command: |
-          bats tests/*bats
+          bats tests/*bats --verbose-run
 
 
 jobs:
