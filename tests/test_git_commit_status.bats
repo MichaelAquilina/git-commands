@@ -1,11 +1,5 @@
 function setup {
-    gcs="$PWD/git-commit-status"
-    gw="$PWD/git-web"
-
-    function git-web {
-        "$gw"
-    }
-    export -f git-web
+    export PATH="$PWD:$PATH"
 
     # Create test git directory
     target="$(mktemp -d)"
@@ -38,7 +32,7 @@ function teardown {
     }
     export -f curl
 
-    run "$gcs"
+    run git commit-status
 
     [ $status -eq 1 ]
     [ "$output" == "404: Not Found" ]
@@ -47,7 +41,7 @@ function teardown {
 @test 'warns for unsupported providers' {
     git remote add origin git@gitlab.com:test/test.git
 
-    run "$gcs"
+    run git commit-status
 
     [ $status -eq 1 ]
     [ "$output" == "Unknown or unsupported API for https://gitlab.com/test/test" ]
