@@ -1,0 +1,126 @@
+#!/bin/bash
+
+set -e
+
+if ! type jq >/dev/null; then
+    printf "jq is required to run git commit-status"
+    exit 1
+fi
+
+url="$(git web --api --print)"
+
+if [[ -n "$1" ]]; then
+    ref="$1"
+else
+    ref="$(git rev-parse HEAD)"
+fi
+
+function get_github_api_key() {
+    if [[ -n "$GITHUB_API_KEY_PASS_NAME" ]]; then
+        printf "%s" "$(pass show "$GITHUB_API_KEY_PASS_NAME" | head -1)"
+    elif  [[ -n "$GITHUB_API_KEY" ]]; then
+        printf "%s" "$GITHUB_API_KEY"
+    fi
+}
+
+function curl_github {
+    local endpoint="$1"
+    local curl_args=(
+        -L --silent
+        -H "Accept: application/vnd.github+json"
+        -H "X-GitHub-Api-Version: 2022-11-28"
+    )
+    local github_api_key
+    github_api_key="$(get_github_api_key)"
+
+    if [[ -n "$github_api_key" ]]; then
+        curl_args+=(-H "Authorization: Bearer $github_api_key")
+    fi
+
+    curl "${curl_args[@]}" "$endpoint"
+}
+
+function github_status_request {
+    local url="$1"
+    local ref="$2"
+    local response
+
+    response="$(curl_github "${url}/commits/${ref}/status")"
+    status="$(jq -r '.status' <<< "$response")"
+
+    if [[ "$status" != "null" ]]; then
+        message="$(jq -r '.message' <<< "$response")"
+        printf "%s: %s\n" "$status" "$message"
+        return 1
+    else
+        formatting='.statuses[] | "\(.state)\t\u001b]8;;\(.target_url)\u001b\\\(.state): \(.context)\u001b]8;;\u001b\\"'
+        output="$(jq -r "$formatting" <<< "$response")"
+        while IFS=$'\t' read -r state line; do
+            print_status_line "$state" "$line"
+        done <<< "$output"
+    fi
+}
+
+function github_check_runs_request {
+    local url="$1"
+    local ref="$2"
+    local response
+
+    response="$(curl_github "${url}/commits/${ref}/check-runs")"
+    status="$(jq -r '.message' <<< "$response")"
+
+    if [[ "$status" != "null" ]]; then
+        printf "%s: %s\n" "$(jq -r '.status' <<< "$response")" "$status"
+        return 1
+    fi
+
+    # variables in jq triggering false positive lint error
+    # shellcheck disable=SC2016
+    formatting='.check_runs[] |
+        (if .status != "completed" then "pending"
+        elif .conclusion == "success" then "success"
+        elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
+        else "neutral"
+        end) as $state |
+        "\($state)\t\u001b]8;;\(.html_url)\u001b\\\($state): \(.name)\u001b]8;;\u001b\\"'
+
+    output="$(jq -r "$formatting" <<< "$response")"
+    if [[ -n "$output" ]]; then
+        while IFS=$'\t' read -r state line; do
+            print_status_line "$state" "$line"
+        done <<< "$output"
+    fi
+}
+
+function print_status_line {
+    local state="$1"
+    local line="$2"
+    local color=""
+    local GREEN="\e[32m"
+    local BEIGE="\e[33m"
+    local RED="\e[31m"
+    local NC="\e[0m"
+
+    if [[ "$state" == "success" ]]; then
+        color="$GREEN"
+    elif [[ "$state" == "pending" ]]; then
+        color="$BEIGE"
+    elif [[ "$state" == "failure" ]]; then
+        color="$RED"
+    elif [[ "$state" == "error" ]]; then
+        color="$BEIGE"
+    fi
+
+    printf "$color%s$NC\n" "$line"
+}
+
+if [[ "$url" == "https://api.github.com/"* ]]; then
+    if ! github_status_request "$url" "$ref"; then
+        exit 1
+    elif ! github_check_runs_request "$url" "$ref"; then
+        exit 1
+    fi
+else
+    printf "Unknown or unsupported API for %s\n" "$(git web --print)"
+    exit 1
+fi

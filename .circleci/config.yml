@@ -8,7 +8,7 @@ test: &test
     - run:
         name: install bats
         command: |
-          apk update && apk add bats git
+          apk update && apk add bats git jq
     - run:
         name: setup basic git configuration
         command: |
@@ -18,7 +18,7 @@ test: &test
     - run:
         name: Run tests
         command: |
-          bats tests/*bats
+          bats tests/*bats --verbose-run
 
 
 jobs:

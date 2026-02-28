@@ -11,6 +11,7 @@ Helper commands for git.
 * git-clean-branches_
 * git-default-branch_
 * git-rollback_
+* git-commit-status_
 
 Copy any of these commands in to your "$PATH" to make them accessible as a git subcommand
 
@@ -127,6 +128,22 @@ Accepts and passes through any arguments to the resulting `git reset` command
     git rollback         # performs the default mixed reset on selected commit
     git rollback --hard  # performs a hard reset on selected commit
     git rollback -p      # performs an interactive patch reset on selected commit
+
+
+git-commit-status
+=================
+
+Prints the associated commit statuses from your SCM provider for the "origin" remote.
+
+The printed text is hyperlinked within the terminal to allow you to click through
+and see details.
+
+Currently only supports github.
+
+.. code:: shell
+
+   git commit-status                  # prints current HEAD by default
+   git commit-status my-branch-name   # supports any ref
 
 
 .. |CircleCI| image:: https://circleci.com/gh/MichaelAquilina/git-commands.svg?style=svg
