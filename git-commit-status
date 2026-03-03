@@ -15,6 +15,16 @@ else
     ref="$(git rev-parse HEAD)"
 fi
 
+function supports_hyperlinks {
+    # watch(1) sets WATCH_INTERVAL before running the command
+    [[ -n "$WATCH_INTERVAL" ]] && return 1
+    # Not a TTY (piped/redirected)
+    [[ ! -t 1 ]] && return 1
+    # Dumb terminal
+    [[ "$TERM" == "dumb" ]] && return 1
+    return 0
+}
+
 function get_github_api_key() {
     if [[ -n "$GITHUB_API_KEY_PASS_NAME" ]]; then
         printf "%s" "$(pass show "$GITHUB_API_KEY_PASS_NAME" | head -1)"
@@ -53,11 +63,17 @@ function github_status_request {
         printf "%s: %s\n" "$status" "$message"
         return 1
     else
-        formatting='.statuses[] | "\(.state)\t\u001b]8;;\(.target_url)\u001b\\\(.state): \(.context)\u001b]8;;\u001b\\"'
+        if supports_hyperlinks; then
+            formatting='.statuses[] | "\(.state)\t\u001b]8;;\(.target_url)\u001b\\\(.state): \(.context)\u001b]8;;\u001b\\"'
+        else
+            formatting='.statuses[] | "\(.state)\t\(.state): \(.context)"'
+        fi
         output="$(jq -r "$formatting" <<< "$response")"
-        while IFS=$'\t' read -r state line; do
-            print_status_line "$state" "$line"
-        done <<< "$output"
+        if [[ -n "$output" ]]; then
+            while IFS=$'\t' read -r state line; do
+                print_status_line "$state" "$line"
+            done <<< "$output"
+        fi
     fi
 }
 
@@ -76,13 +92,23 @@ function github_check_runs_request {
 
     # variables in jq triggering false positive lint error
     # shellcheck disable=SC2016
-    formatting='.check_runs[] |
-        (if .status != "completed" then "pending"
-        elif .conclusion == "success" then "success"
-        elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
-        else "neutral"
-        end) as $state |
-        "\($state)\t\u001b]8;;\(.html_url)\u001b\\\($state): \(.name)\u001b]8;;\u001b\\"'
+    if supports_hyperlinks; then
+        formatting='.check_runs[] |
+            (if .status != "completed" then "pending"
+            elif .conclusion == "success" then "success"
+            elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
+            else "neutral"
+            end) as $state |
+            "\($state)\t\u001b]8;;\(.html_url)\u001b\\\($state): \(.name)\u001b]8;;\u001b\\"'
+    else
+        formatting='.check_runs[] |
+            (if .status != "completed" then "pending"
+            elif .conclusion == "success" then "success"
+            elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
+            else "neutral"
+            end) as $state |
+            "\($state)\t\($state): \(.name)"'
+    fi
 
     output="$(jq -r "$formatting" <<< "$response")"
     if [[ -n "$output" ]]; then

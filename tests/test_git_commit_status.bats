@@ -111,8 +111,8 @@ function teardown {
     run git commit-status
 
     [ $status -eq 0 ]
-    [[ "${lines[0]}" =~ .+https://ci\.com/1234.+success:\ tests.+ ]]
-    [[ "${lines[1]}" =~ .+https://ci\.com/1245.+failure:\ lint.+ ]]
+    [[ "${lines[0]}" =~ success:\ tests ]]
+    [[ "${lines[1]}" =~ failure:\ lint ]]
 }
 
 @test 'git-commit-status -> prints check runs' {
@@ -138,7 +138,7 @@ function teardown {
     run git commit-status
 
     [ $status -eq 0 ]
-    [[ "$output" =~ .+https://ceye\.org/abcd.+pending:\ deploy\ to\ prod.+ ]]
+    [[ "$output" =~ pending:\ deploy\ to\ prod ]]
 }
 
 
