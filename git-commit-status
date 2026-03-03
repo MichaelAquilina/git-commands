@@ -96,22 +96,31 @@ function print_status_line {
     local state="$1"
     local line="$2"
     local color=""
+    local symbol=""
     local GREEN="\e[32m"
     local BEIGE="\e[33m"
     local RED="\e[31m"
+    local GREY="\e[90m"
     local NC="\e[0m"
 
     if [[ "$state" == "success" ]]; then
         color="$GREEN"
+        symbol="✓"
     elif [[ "$state" == "pending" ]]; then
         color="$BEIGE"
+        symbol="●"
     elif [[ "$state" == "failure" ]]; then
         color="$RED"
+        symbol="✗"
     elif [[ "$state" == "error" ]]; then
-        color="$BEIGE"
+        color="$RED"
+        symbol="✗"
+    else
+        color="$GREY"
+        symbol="○"
     fi
 
-    printf "$color%s$NC\n" "$line"
+    printf "$color%s $NC%s\n" "$symbol" "$line"
 }
 
 if [[ "$url" == "https://api.github.com/"* ]]; then
