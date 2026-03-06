@@ -63,15 +63,11 @@ function github_status_request {
         printf "%s: %s\n" "$status" "$message"
         return 1
     else
-        if supports_hyperlinks; then
-            formatting='.statuses[] | "\(.state)\t\u001b]8;;\(.target_url)\u001b\\\(.state): \(.context)\u001b]8;;\u001b\\"'
-        else
-            formatting='.statuses[] | "\(.state)\t\(.state): \(.context)"'
-        fi
-        output="$(jq -r "$formatting" <<< "$response")"
+        formatting='.statuses[] | {status: .state, url: .target_url, name: .context}'
+        output="$(jq -rc "$formatting" <<< "$response")"
         if [[ -n "$output" ]]; then
-            while IFS=$'\t' read -r state line; do
-                print_status_line "$state" "$line"
+            while read -r line; do
+                print_status_line "$line"
             done <<< "$output"
         fi
     fi
@@ -90,37 +86,30 @@ function github_check_runs_request {
         return 1
     fi
 
-    # variables in jq triggering false positive lint error
     # shellcheck disable=SC2016
-    if supports_hyperlinks; then
-        formatting='.check_runs[] |
-            (if .status != "completed" then "pending"
-            elif .conclusion == "success" then "success"
-            elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
-            else "neutral"
-            end) as $state |
-            "\($state)\t\u001b]8;;\(.html_url)\u001b\\\($state): \(.name)\u001b]8;;\u001b\\"'
-    else
-        formatting='.check_runs[] |
-            (if .status != "completed" then "pending"
-            elif .conclusion == "success" then "success"
-            elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
-            else "neutral"
-            end) as $state |
-            "\($state)\t\($state): \(.name)"'
-    fi
+    formatting='.check_runs[] |
+        (if .status != "completed" then "pending"
+        elif .conclusion == "success" then "success"
+        elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
+        else "neutral"
+        end) as $state | {status: $state, url: .target_url, name: .name}'
 
-    output="$(jq -r "$formatting" <<< "$response")"
+    output="$(jq -rc "$formatting" <<< "$response")"
     if [[ -n "$output" ]]; then
-        while IFS=$'\t' read -r state line; do
-            print_status_line "$state" "$line"
+        while read -r line; do
+            print_status_line "$line"
         done <<< "$output"
     fi
 }
 
 function print_status_line {
-    local state="$1"
-    local line="$2"
+    local status
+    local url
+    local name
+    status="$(jq -r .status <<< "$1")"
+    url="$(jq -r .url <<< "$1")"
+    name="$(jq -r .name <<< "$1")"
+
     local color=""
     local symbol=""
     local GREEN="\e[32m"
@@ -129,21 +118,27 @@ function print_status_line {
     local GREY="\e[90m"
     local NC="\e[0m"
 
-    if [[ "$state" == "success" ]]; then
+    if [[ "$status" == "success" ]]; then
         color="$GREEN"
         symbol="✓"
-    elif [[ "$state" == "pending" ]]; then
+    elif [[ "$status" == "pending" ]]; then
         color="$BEIGE"
         symbol="●"
-    elif [[ "$state" == "failure" ]]; then
+    elif [[ "$status" == "failure" ]]; then
         color="$RED"
         symbol="✗"
-    elif [[ "$state" == "error" ]]; then
+    elif [[ "$status" == "error" ]]; then
         color="$RED"
         symbol="✗"
     else
         color="$GREY"
         symbol="○"
+    fi
+
+    if supports_hyperlinks; then
+        line=$'\e]8;;'"${url}"$'\e\\'"${status}: ${name}"$'\e]8;;\e\\'
+    else
+        line="${status}: ${name}"
     fi
 
     printf "$color%s $NC%s\n" "$symbol" "$line"
