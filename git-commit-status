@@ -12,7 +12,7 @@ url="$(git web --api --print)"
 if [[ -n "$1" ]]; then
     ref="$1"
 else
-    ref="$(git rev-parse HEAD)"
+    ref="$(git symbolic-ref --short HEAD)"
 fi
 
 function supports_hyperlinks {

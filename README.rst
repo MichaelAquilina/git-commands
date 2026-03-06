@@ -142,7 +142,7 @@ Currently only supports github.
 
 .. code:: shell
 
-   git commit-status                  # prints current HEAD by default
+   git commit-status                  # prints latest branch status by default
    git commit-status my-branch-name   # supports any ref
 
 
