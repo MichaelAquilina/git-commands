@@ -136,7 +136,7 @@ function print_status_line {
     fi
 
     if supports_hyperlinks; then
-        line=$'\e]8;;'"${url}"$'\e\\'"${status}: ${name}"$'\e]8;;\e\\'
+        printf -v line $'\e]8;;%s\e\\%s: %s\e]8;;\e\\' "$url" "$status" "$name"
     else
         line="${status}: ${name}"
     fi
