@@ -91,7 +91,7 @@ function github_check_runs_request {
         (if .status != "completed" then "pending"
         elif .conclusion == "success" then "success"
         elif (.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "action_required") then "failure"
-        else "neutral"
+        else "skipped"
         end) as $state | {status: $state, url: .target_url, name: .name}'
 
     output="$(jq -rc "$formatting" <<< "$response")"
@@ -130,6 +130,9 @@ function print_status_line {
     elif [[ "$status" == "error" ]]; then
         color="$RED"
         symbol="✗"
+    elif [[ "$status" == "skipped" ]]; then
+        color="$GREY"
+        symbol="⊘"
     else
         color="$GREY"
         symbol="○"
