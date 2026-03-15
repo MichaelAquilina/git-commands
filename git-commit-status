@@ -7,6 +7,11 @@ if ! type jq >/dev/null; then
     exit 1
 fi
 
+if ! type git-web > /dev/null; then
+    printf "git-web is required to run git commit-status"
+    exit 1
+fi
+
 url="$(git web --api --print)"
 
 if [[ -n "$1" ]]; then
