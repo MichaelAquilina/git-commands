@@ -45,7 +45,7 @@ function teardown {
             printf 'boom'  # invalid JSON will fail the test
         elif [[ "$url" == *"/status" ]]; then
             printf '{"stasuses": []}'
-        elif [[ "$url == */check-runs" ]]; then
+        elif [[ "$url" == */check-runs ]]; then
             printf '{"check_runs": []}'
         fi
     }
@@ -71,7 +71,7 @@ function teardown {
             printf 'boom'  # invalid JSON will fail the test
         elif [[ "$url" == *"/status" ]]; then
             printf '{"stasuses": []}'
-        elif [[ "$url == */check-runs" ]]; then
+        elif [[ "$url" == */check-runs ]]; then
             printf '{"check_runs": []}'
         fi
     }
@@ -102,7 +102,7 @@ function teardown {
                     }
                 ]
             }'
-        elif [[ "$url == */check-runs" ]]; then
+        elif [[ "$url" == */check-runs ]]; then
             printf '{"check_runs": []}'
         fi
     }
@@ -121,7 +121,7 @@ function teardown {
         local url="${@: -1}"
         if [[ "$url" == *"/status" ]]; then
             printf '{"statuses": []}'
-        elif [[ "$url == */check-runs" ]]; then
+        elif [[ "$url" == */check-runs ]]; then
             printf '{
                 "check_runs": [
                     {
