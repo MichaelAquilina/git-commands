@@ -25,7 +25,7 @@ function pulls_path {
 function commits_path {
     DOMAIN="$1"
     if [[ "$DOMAIN" == "gitlab.com" ]]; then
-        prinf "-/commits/"
+        printf "-/commits/"
     elif [[ "$DOMAIN" == "github.com" ]]; then
         printf "commits/"
     elif [[ "$DOMAIN" == "bitbucket.org" ]]; then
