@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 if ! type jq >/dev/null; then
     printf "jq is required to run git commit-status"
     exit 1
@@ -84,10 +82,9 @@ function github_check_runs_request {
     local response
 
     response="$(curl_github "${url}/commits/${ref}/check-runs")"
-    status="$(jq -r '.message' <<< "$response")"
 
-    if [[ "$status" != "null" ]]; then
-        printf "%s: %s\n" "$(jq -r '.status' <<< "$response")" "$status"
+    if [[ "$(jq -r '.check_runs' <<< "$response")" == "null" ]]; then
+        printf "%s: %s\n" "$(jq -r '.status' <<< "$response")" "$(jq -r '.message' <<< "$response")"
         return 1
     fi
 
