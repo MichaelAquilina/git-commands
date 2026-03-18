@@ -141,12 +141,19 @@ function print_status_line {
     fi
 
     if supports_hyperlinks; then
-        printf -v line $'\e]8;;%s\e\\%s: %s\e]8;;\e\\' "$url" "$status" "$name"
+        line="$(print_hyperlink "$status: $name" "$url")"
     else
         line="${status}: ${name}"
     fi
 
     printf "$color%s $NC%s\n" "$symbol" "$line"
+}
+
+function print_hyperlink() {
+    local text="$1"
+    local url="$2"
+
+    printf '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
 }
 
 if [[ "$url" == "https://api.github.com/"* ]]; then
