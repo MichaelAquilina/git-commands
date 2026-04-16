@@ -153,6 +153,8 @@ function print_hyperlink() {
     local text="$1"
     local url="$2"
 
+    # SC1003 false positive: the \\ is a printf escape for a literal backslash, not a single quote escape
+    # shellcheck disable=SC1003
     printf '\e]8;;%s\e\\%s\e]8;;\e\\' "$url" "$text"
 }
 
