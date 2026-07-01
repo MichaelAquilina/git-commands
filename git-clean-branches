@@ -1,5 +1,6 @@
 #!/bin/bash
 delete_type="-d"
+worktree_remove_flag=""
 
 if type git-default-branch > /dev/null 2>&1; then
     target="$(git default-branch)"
@@ -10,13 +11,37 @@ fi
 
 if [[ "$1" == "-D" ]]; then
     delete_type="-D"
+    worktree_remove_flag="--force"
 elif [[ -n "$1" ]]; then
     target="$1"
 fi
 
 [ -z "$(git branch)" ] && exit
 
+declare -A worktree_paths
+worktree_index=0
+while read -r key value; do
+    case "$key" in
+        worktree)
+            worktree_path="$value"
+            worktree_index=$((worktree_index + 1))
+            ;;
+        branch)
+            # the first entry listed is always the main working tree, which can never be removed
+            if [[ $worktree_index -gt 1 ]]; then
+                worktree_paths["${value#refs/heads/}"]="$worktree_path"
+            fi
+            ;;
+    esac
+done < <(git worktree list --porcelain)
+
 git branch --merged "$target" | grep -v "$target" | while read -r branch;
 do
+    branch="${branch#[*+] }"
+
+    if [[ -n "${worktree_paths[$branch]}" ]]; then
+        git worktree remove $worktree_remove_flag "${worktree_paths[$branch]}"
+    fi
+
     git branch "$delete_type" "${branch}"
 done

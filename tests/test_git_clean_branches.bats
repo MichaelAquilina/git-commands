@@ -107,6 +107,41 @@ function teardown {
 }
 
 
+@test 'git-clean-branches -> removes the worktree and deletes the branch when a merged branch is checked out elsewhere' {
+  touch "hello.txt"
+  git add hello.txt
+  git commit -m "test commit"
+
+  # Start off a new branch
+  git checkout -b merged_branch
+  echo hello > "hello.txt"
+  git commit -am "updated commit"
+
+  git checkout "${main}"
+
+  # make sure its not simplified into a rebase
+  echo "hello" > hello2.txt
+  git add .
+  git commit -m "master commit"
+
+  git merge merged_branch
+  commit_id="$(git rev-parse --short merged_branch)"
+
+  worktree_dir="$(mktemp -d)"
+  git worktree add "$worktree_dir" merged_branch
+
+  run "$gcb"
+
+  [ $status -eq 0 ]
+  [ "$output" = "Deleted branch merged_branch (was $commit_id)." ]
+
+  run git worktree list
+  [[ "$output" != *"$worktree_dir"* ]]
+
+  [ ! -d "$worktree_dir" ]
+}
+
+
 @test 'git-clean-branches -> does clean out non-empty merged branches' {
   touch "hello.txt"
   git add hello.txt
